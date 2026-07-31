@@ -1,0 +1,9 @@
+[package]
+name = "engine"
+version = "0.1.0"
+edition.workspace = true
+description = "Typing state machine, WPM/accuracy calc, keystroke event log"
+
+[dependencies]
+
+[dev-dependencies]

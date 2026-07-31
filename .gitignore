@@ -1,0 +1,18 @@
+# Rust
+/target
+**/*.rs.bk
+
+# Leptos / Trunk
+crates/app/dist/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
