@@ -18,6 +18,7 @@
     /* Colors — Semantic */
     --color-correct: #2d8a4e;
     --color-error: #d32f2f;
+    --color-error-soft: #ef5350;
 
     /* Typography */
     --font-display: "Inter", system-ui, sans-serif;
@@ -212,7 +213,7 @@ body {
 
 @keyframes flash {
     0%, 100% { background-color: var(--color-error); }
-    50% { background-color: #ef5350; }
+    50% { background-color: var(--color-error-soft); }
 }
 
 /* Stats Bar */
