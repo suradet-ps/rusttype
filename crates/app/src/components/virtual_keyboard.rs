@@ -1,7 +1,7 @@
 //! On-screen QWERTY keyboard: finger colours + next-key highlight.
 //!
 //! Renders the physical keyboard (see `crate::keyboard`) with one colour per
-//! finger (`{finger.*}` tokens from DESIGN.md) and outlines the key that
+//! finger (`{finger.*}` tokens from docs/DESIGN.md) and outlines the key that
 //! produces the next target character in `{colors.primary}`. This component
 //! is visual-only — input always comes from the physical keyboard.
 

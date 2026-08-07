@@ -2,9 +2,9 @@
 
 A code-typing practice web app for Rust developers, built with Leptos v0.8 (CSR/WASM). Practice touch-typing real Rust code with syntax highlighting, strict-mode correctness, and WPM/accuracy tracking.
 
-This document is the implementation contract for AI coding agents (and humans) working on this repo. It references `DESIGN.md` for all visual tokens (colors, spacing, typography) — do not restate design values here; look them up by token name in `DESIGN.md`.
+This document is the implementation contract for AI coding agents (and humans) working on this repo. It references `docs/DESIGN.md` for all visual tokens (colors, spacing, typography) — do not restate design values here; look them up by token name in `docs/DESIGN.md`.
 
-Rust-wide conventions (error handling, lint policy, CI) are defined once in the shared `AGENTS-RUST.md` and apply to every crate in this workspace unless explicitly overridden below.
+Rust-wide conventions (error handling, lint policy, CI) are defined once in the shared `docs/AGENTS-RUST.md` and apply to every crate in this workspace unless explicitly overridden below.
 
 ---
 
@@ -22,8 +22,9 @@ Non-goals (out of scope for v1): multiplayer/races, mobile native app, server-si
 rusttype/
 ├── Cargo.toml                 # workspace root
 ├── AGENTS.md                  # this file
-├── AGENTS-RUST.md             # shared Rust conventions (symlink or copy from other projects)
-├── DESIGN.md                  # design tokens (colors, type scale, spacing) — single source of truth
+├── docs/
+│   ├── DESIGN.md              # design tokens (colors, type scale, spacing) — single source of truth
+│   └── AGENTS-RUST.md         # shared Rust conventions (symlink or copy from other projects)
 ├── crates/
 │   ├── app/                   # Leptos CSR UI: components, routing, top-level state
 │   ├── engine/                # typing state machine, WPM/accuracy calc, keystroke event log
@@ -44,9 +45,9 @@ rusttype/
 | Syntax highlighting | `syntect` | reuse config approach from CodeShot project |
 | Serialization | `serde` + `serde_json` | for snippet storage and keystroke logs |
 | Local persistence | `localStorage` via `web-sys` | user-provided snippets, session stats, settings |
-| Error handling | `thiserror` (library crates), `anyhow` (app-level only) | per AGENTS-RUST.md — no `unwrap`/`expect` in non-test code |
+| Error handling | `thiserror` (library crates), `anyhow` (app-level only) | per docs/AGENTS-RUST.md — no `unwrap`/`expect` in non-test code |
 | Build tooling | `trunk` | CSR bundling |
-| Lint/CI | `cargo fmt`, `cargo clippy -- -D warnings`, `cargo audit` | per AGENTS-RUST.md, SHA-pinned GitHub Actions |
+| Lint/CI | `cargo fmt`, `cargo clippy -- -D warnings`, `cargo audit` | per docs/AGENTS-RUST.md, SHA-pinned GitHub Actions |
 
 ---
 
@@ -141,7 +142,7 @@ Key implementation constraints:
 - `CodeDisplay` re-renders highlighting spans only for the affected region on each keystroke, not the whole snippet, to keep large snippets responsive.
 - Auto-scroll: the current-char span is anchored at 20% from the left edge of the `.code-display` scroll container and clamped vertically so the typed line stays visible (the pane scrolls both axes internally; the page itself never jumps). Implemented as an `Effect` in `TypingSession` (where the cursor signal lives), keyed off the `rusttype-current-char` DOM id.
 - `VirtualKeyboard` layout data lives in `crate::keyboard` (pure Rust, unit-tested): QWERTY rows, per-finger colour classes (`finger-lp`…`finger-rp`, `{finger.*}` tokens), and `key_id_for_char` mapping target characters to physical keys. QWERTY is a physical-keyboard concern, not a language model — Rust-only stays intact.
-- All colors, fonts, and spacing in `CodeDisplay` / `StatsBar` / `VirtualKeyboard` reference `DESIGN.md` tokens by name (e.g. `--color-correct`, `--color-error`, `--font-mono`) — do not hardcode hex values in components.
+- All colors, fonts, and spacing in `CodeDisplay` / `StatsBar` / `VirtualKeyboard` reference `docs/DESIGN.md` tokens by name (e.g. `--color-correct`, `--color-error`, `--font-mono`) — do not hardcode hex values in components.
 
 ---
 
@@ -159,7 +160,7 @@ Key implementation constraints:
 - Manual QA: verify WPM against a stopwatch for at least one full snippet.
 
 ### M2 — Wrong-keystroke UX polish
-- Visual flash/shake on the mistyped character (CSS only, tokens from `DESIGN.md`).
+- Visual flash/shake on the mistyped character (CSS only, tokens from `docs/DESIGN.md`).
 - Distinguish "wrong character" from "wrong whitespace/newline" in the UI, since these are the most common frustration point in strict mode.
 
 ### M3 — Indentation correctness
@@ -198,7 +199,7 @@ Key implementation constraints:
 
 - `engine`: unit tests for every `KeyResult` branch, WPM formula edge cases (zero elapsed time, single-character snippet), and indentation-sensitive sequences.
 - `snippets`: unit tests for `SnippetStore` validation errors (`Empty`, `TooLong`) and round-trip serialization.
-- No `unwrap`/`expect` outside `#[cfg(test)]` blocks, per `AGENTS-RUST.md`.
+- No `unwrap`/`expect` outside `#[cfg(test)]` blocks, per `docs/AGENTS-RUST.md`.
 - `cargo clippy -- -D warnings` and `cargo fmt --check` must pass in CI before merge.
 
 ---
@@ -221,5 +222,5 @@ Key implementation constraints:
 
 ## 10. References
 
-- `DESIGN.md` — all visual design tokens (color, typography, spacing, layout grid). Look up by token name; do not duplicate values here.
-- `AGENTS-RUST.md` — shared Rust conventions (error handling, lint policy, CI security hardening) applying to all crates in this workspace.
+- `docs/DESIGN.md` — all visual design tokens (color, typography, spacing, layout grid). Look up by token name; do not duplicate values here.
+- `docs/AGENTS-RUST.md` — shared Rust conventions (error handling, lint policy, CI security hardening) applying to all crates in this workspace.
