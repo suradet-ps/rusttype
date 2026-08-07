@@ -7,7 +7,7 @@
 Built with [Leptos](https://github.com/leptos-rs/leptos) (CSR/WASM) + [syntect](https://github.com/trishume/syntect) syntax highlighting.
 Practice touch-typing real Rust code with strict-mode correctness, per-character error tracking, and WPM/accuracy stats.
 
-[![CI](https://github.com/user/codetype/actions/workflows/ci.yml/badge.svg)](https://github.com/user/codetype/actions)
+[![CI](https://github.com/suradet-ps/rusttype/actions/workflows/ci.yml/badge.svg)](https://github.com/suradet-ps/rusttype/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 </div>

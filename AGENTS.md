@@ -19,7 +19,7 @@ Non-goals (out of scope for v1): multiplayer/races, mobile native app, server-si
 ## 2. Workspace Architecture (ports-lite)
 
 ```
-codetype/
+rusttype/
 ├── Cargo.toml                 # workspace root
 ├── AGENTS.md                  # this file
 ├── AGENTS-RUST.md             # shared Rust conventions (symlink or copy from other projects)
