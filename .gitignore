@@ -2,9 +2,8 @@
 /target
 **/*.rs.bk
 
-# Leptos / Trunk
-crates/app/dist/
-dist/
+# Trunk
+/dist
 
 # OS
 .DS_Store

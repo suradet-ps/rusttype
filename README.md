@@ -40,8 +40,7 @@ rustup target add wasm32-unknown-unknown
 # Install trunk
 cargo install trunk
 
-# Run dev server
-cd crates/app
+# Run dev server (from repo root)
 trunk serve --port 3000
 ```
 
@@ -75,8 +74,8 @@ cargo fmt --check
 cargo clippy -- -D warnings
 cargo test
 
-# Run WASM dev server
-cd crates/app && trunk serve --port 3000
+# Run WASM dev server (from repo root)
+trunk serve --port 3000
 ```
 
 ## Milestones

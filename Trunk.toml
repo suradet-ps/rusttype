@@ -1,0 +1,19 @@
+# Trunk config for the RustType workspace.
+#
+# This file must exist: without it, Trunk auto-detects the workspace-root
+# Cargo.toml as its config source and fails because a virtual manifest has no
+# root package. The Rust app to build is wired up in index.html via
+# `<link data-trunk rel="rust" href="crates/app/Cargo.toml" .../>`.
+
+[build]
+target = "index.html"
+dist = "dist"
+public_url = "/"
+
+[watch]
+ignore = ["target", "dist"]
+
+[serve]
+addresses = ["127.0.0.1"]
+port = 3000
+open = false
