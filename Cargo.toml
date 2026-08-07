@@ -11,3 +11,9 @@ repository = "https://github.com/suradet-ps/rusttype"
 thiserror = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+# Small + fast WASM binary.
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
