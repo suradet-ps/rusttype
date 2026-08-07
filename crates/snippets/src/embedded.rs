@@ -1,6 +1,9 @@
 use crate::model::{Snippet, SnippetSource};
 
-/// Embedded snippet data loaded at compile time.
+/// Embedded Rust snippet data loaded at compile time.
+///
+/// RustType is Rust-only by design: every embedded snippet is Rust source
+/// bundled via `include_str!` and enumerated here at compile time.
 pub struct EmbeddedSnippets {
   snippets: Vec<Snippet>,
 }
@@ -63,7 +66,6 @@ impl EmbeddedSnippets {
 
       snippets.push(Snippet {
         id: format!("embedded-rust-{id:02}"),
-        language: crate::model::Language::Rust,
         source: SnippetSource::Embedded,
         title,
         code: code.trim_end().to_string(),
@@ -73,14 +75,9 @@ impl EmbeddedSnippets {
     Self { snippets }
   }
 
-  /// List all embedded snippets, optionally filtered by language.
-  pub fn list(&self, language: Option<crate::model::Language>) -> Vec<Snippet> {
-    self
-      .snippets
-      .iter()
-      .filter(|s| language.is_none_or(|l| s.language == l))
-      .cloned()
-      .collect()
+  /// List all embedded snippets.
+  pub fn list(&self) -> Vec<Snippet> {
+    self.snippets.clone()
   }
 }
 
@@ -93,20 +90,19 @@ impl Default for EmbeddedSnippets {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::model::Language;
 
   #[test]
   fn embedded_snippets_not_empty() {
     let embedded = EmbeddedSnippets::new();
-    assert!(!embedded.list(None).is_empty());
+    assert!(!embedded.list().is_empty());
   }
 
   #[test]
-  fn embedded_snippets_all_rust() {
+  fn embedded_snippets_are_user_visible_rust() {
     let embedded = EmbeddedSnippets::new();
-    for snippet in embedded.list(None) {
-      assert_eq!(snippet.language, Language::Rust);
+    for snippet in embedded.list() {
       assert_eq!(snippet.source, SnippetSource::Embedded);
+      assert!(!snippet.title.is_empty());
     }
   }
 
@@ -115,21 +111,12 @@ mod tests {
     // CRLF in embedded snippets would softlock strict-mode typing: the
     // untypeable '\r' would precede every newline.
     let embedded = EmbeddedSnippets::new();
-    for snippet in embedded.list(None) {
+    for snippet in embedded.list() {
       assert!(
         !snippet.code.contains('\r'),
         "snippet {} contains CR",
         snippet.id
       );
     }
-  }
-
-  #[test]
-  fn filter_by_language() {
-    let embedded = EmbeddedSnippets::new();
-    let rust_only = embedded.list(Some(Language::Rust));
-    let python_only = embedded.list(Some(Language::Python));
-    assert!(!rust_only.is_empty());
-    assert!(python_only.is_empty());
   }
 }

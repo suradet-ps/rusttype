@@ -1,17 +1,22 @@
 use leptos::either::Either;
 use leptos::prelude::*;
+use snippets::Snippet;
 
 mod components;
-mod style;
+mod store;
 
-use components::TypingSession;
-use snippets::{EmbeddedSnippets, Language};
+use components::{SnippetImporter, SnippetPicker, TypingSession};
 
 #[component]
 fn App() -> impl IntoView {
-  let embedded = EmbeddedSnippets::new();
-  let snippets = embedded.list(Some(Language::Rust));
-  let (selected, set_selected) = signal(None::<snippets::Snippet>);
+  let (selected, set_selected) = signal(None::<Snippet>);
+  let (importing, set_importing) = signal(false);
+  let (store_version, set_store_version) = signal(0u32);
+
+  let back_to_picker = move || {
+    set_selected.set(None);
+    set_importing.set(false);
+  };
 
   view! {
       <div class="app">
@@ -25,37 +30,29 @@ fn App() -> impl IntoView {
 
           <main class="main-content">
               {move || {
-                  if let Some(s) = selected.get() {
-                      Either::Left(view! { <TypingSession snippet=s /> })
-                  } else {
-                      Either::Right(view! {
-                          <div class="snippet-picker">
-                              <h2 class="section-title">"Choose a snippet"</h2>
-                              <div class="snippet-list">
-                                  {snippets.iter().map(|s| {
-                                      let id = s.id.clone();
-                                      let title = s.title.clone();
-                                      let preview: String = s.code.chars().take(80).collect();
-                                        view! {
-                                            <button
-                                                class="snippet-card"
-                                                on:click=move |_| {
-                                                  let s = snippets::EmbeddedSnippets::new()
-                                                      .list(Some(Language::Rust))
-                                                      .into_iter()
-                                                      .find(|s| s.id == id)
-                                                      .expect("invariant: snippet id exists");
-                                                  set_selected.set(Some(s));
-                                              }
-                                          >
-                                              <span class="snippet-card-title">{title}</span>
-                                              <code class="snippet-card-preview">{preview}</code>
-                                          </button>
-                                      }
-                                  }).collect_view()}
-                              </div>
-                          </div>
+                  if importing.get() {
+                      Either::Left(view! {
+                          <SnippetImporter
+                              on_saved=Callback::new(move |()| {
+                                  set_importing.set(false);
+                                  set_store_version.update(|v| *v += 1);
+                              })
+                              on_cancel=Callback::new(move |()| set_importing.set(false))
+                          />
                       })
+                  } else if let Some(snippet) = selected.get() {
+                      Either::Right(Either::Left(view! {
+                          <TypingSession snippet=snippet on_back=back_to_picker />
+                      }))
+                  } else {
+                      Either::Right(Either::Right(view! {
+                          <SnippetPicker
+                              on_select=Callback::new(move |snippet| set_selected.set(Some(snippet)))
+                              on_import=Callback::new(move |()| set_importing.set(true))
+                              on_changed=Callback::new(move |()| set_store_version.update(|v| *v += 1))
+                              store_version=store_version.into()
+                          />
+                      }))
                   }
               }}
           </main>

@@ -26,19 +26,6 @@ pub struct HighlightData {
   pub css: String,
 }
 
-/// Maps a `Language` to the syntect file extension for syntax lookup.
-fn language_extension(language: snippets::Language) -> &'static str {
-  match language {
-    snippets::Language::Rust => "rs",
-    snippets::Language::Python => "py",
-    snippets::Language::JavaScript => "js",
-    snippets::Language::TypeScript => "ts",
-    snippets::Language::Go => "go",
-    snippets::Language::C => "c",
-    snippets::Language::Cpp => "cpp",
-  }
-}
-
 /// Packed RGB + font style, deduplicated into a CSS class.
 #[derive(Clone, Copy, PartialEq)]
 struct TokenStyle {
@@ -91,15 +78,17 @@ fn build_css(palette: &[TokenStyle]) -> String {
   css
 }
 
-fn syntax_for(language: snippets::Language) -> &'static SyntaxReference {
+/// RustType is Rust-only, so the grammar is fixed: the `.rs` extension maps
+/// to the bundled Rust syntax definition.
+fn rust_syntax() -> &'static SyntaxReference {
   syntax_set()
-    .find_syntax_by_extension(language_extension(language))
-    .expect("invariant: grammar for every supported language is bundled")
+    .find_syntax_by_extension("rs")
+    .expect("invariant: Rust grammar is bundled with syntect defaults")
 }
 
-/// Tokenize `code` for `language` and return per-char classes + theme CSS.
-fn tokenize(code: &str, language: snippets::Language) -> HighlightData {
-  let syntax = syntax_for(language);
+/// Tokenize `code` as Rust and return per-char classes + theme CSS.
+fn tokenize(code: &str) -> HighlightData {
+  let syntax = rust_syntax();
   let theme = theme();
   let mut highlighter = HighlightLines::new(syntax, theme);
 
@@ -126,11 +115,11 @@ static CACHE: OnceLock<Mutex<HashMap<String, Arc<HighlightData>>>> = OnceLock::n
 
 /// Returns cached highlight data for the given snippet, tokenizing on first use.
 ///
-/// The full snippet is tokenized exactly once per (language, code) pair; every
+/// The full snippet is tokenized exactly once per code string; every
 /// subsequent keystroke reuses the cached classes so only the affected region
 /// of the view re-renders.
-pub fn get_highlight(code: &str, language: snippets::Language) -> Arc<HighlightData> {
-  let key = format!("{language:?}\u{0}{code}");
+pub fn get_highlight(code: &str) -> Arc<HighlightData> {
+  let key = code.to_string();
   let cache = CACHE.get_or_init(|| Mutex::new(HashMap::new()));
   let mut guard = cache
     .lock()
@@ -138,7 +127,7 @@ pub fn get_highlight(code: &str, language: snippets::Language) -> Arc<HighlightD
   if let Some(hit) = guard.get(&key) {
     return Arc::clone(hit);
   }
-  let data = Arc::new(tokenize(code, language));
+  let data = Arc::new(tokenize(code));
   guard.insert(key, Arc::clone(&data));
   data
 }
@@ -179,32 +168,31 @@ pub fn ensure_css_injected(css: &str) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use snippets::Language;
 
   #[test]
   fn tokenize_assigns_classes_for_all_chars() {
-    let data = tokenize("fn main() {}\n", Language::Rust);
+    let data = tokenize("fn main() {}\n");
     assert_eq!(data.char_classes.len(), "fn main() {}\n".chars().count());
     assert!(data.char_classes.iter().all(|c| *c < 64));
   }
 
   #[test]
   fn tokenize_empty_input() {
-    let data = tokenize("", Language::Rust);
+    let data = tokenize("");
     assert!(data.char_classes.is_empty());
   }
 
   #[test]
   fn tokenize_multibyte_aligns_by_char() {
     let code = "// ไทย\r\nfn main() {}";
-    let data = tokenize(code, Language::Rust);
+    let data = tokenize(code);
     assert_eq!(data.char_classes.len(), code.chars().count());
   }
 
   #[test]
   fn cache_returns_same_data() {
-    let a = get_highlight("fn main() {}", Language::Rust);
-    let b = get_highlight("fn main() {}", Language::Rust);
+    let a = get_highlight("fn main() {}");
+    let b = get_highlight("fn main() {}");
     assert!(Arc::ptr_eq(&a, &b));
   }
 

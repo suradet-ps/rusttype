@@ -1,6 +1,6 @@
 # AGENTS.md — RustType
 
-A code-typing practice web app for Rust developers, built with Leptos v0.8 (CSR/WASM). Practice touch-typing real code with syntax highlighting, strict-mode correctness, and per-language WPM/accuracy tracking.
+A code-typing practice web app for Rust developers, built with Leptos v0.8 (CSR/WASM). Practice touch-typing real Rust code with syntax highlighting, strict-mode correctness, and WPM/accuracy tracking.
 
 This document is the implementation contract for AI coding agents (and humans) working on this repo. It references `DESIGN.md` for all visual tokens (colors, spacing, typography) — do not restate design values here; look them up by token name in `DESIGN.md`.
 
@@ -94,9 +94,9 @@ Rules the engine must enforce (strict mode):
 
 ### 4.2 `snippets` crate
 
-```rust
-pub enum Language { Rust, Python, JavaScript, TypeScript, Go, C, Cpp }
+RustType is Rust-only by design — snippets carry no language field.
 
+```rust
 pub enum SnippetSource {
     Embedded,
     UserProvided,
@@ -104,22 +104,22 @@ pub enum SnippetSource {
 
 pub struct Snippet {
     pub id: String,
-    pub language: Language,
     pub source: SnippetSource,
     pub title: String,
     pub code: String,   // raw, untrimmed — indentation is significant
 }
 
 pub trait SnippetStore {
-    fn list(&self, language: Option<Language>) -> Vec<Snippet>;
-    fn add_user_snippet(&mut self, title: String, language: Language, code: String) -> Result<Snippet, SnippetError>;
+    fn list(&self) -> Vec<Snippet>;
+    fn add_user_snippet(&mut self, title: String, code: String) -> Result<Snippet, SnippetError>;
     fn remove(&mut self, id: &str) -> Result<(), SnippetError>;
 }
 ```
 
-- `Embedded` snippets are loaded via `include_str!` over files in `snippets-data/rust/` (and future per-language folders) enumerated by a build script — never fetched over the network.
-- `UserProvided` snippets are persisted to `localStorage` under a versioned key (e.g. `rusttype:snippets:v1`) and validated (non-empty, reasonable max length — see `SnippetError::TooLong`) before storage.
-- `SnippetError` uses `thiserror` with variants: `Empty`, `TooLong(usize)`, `StorageUnavailable`, `SerializationFailed`.
+- `Embedded` snippets are loaded via `include_str!` over files in `snippets-data/rust/` enumerated at compile time — never fetched over the network. All embedded snippets are Rust.
+- `UserProvided` snippets are persisted to `localStorage` under a versioned key (e.g. `rusttype:snippets:v1`) and validated (non-empty, reasonable max length — see `SnippetError::TooLong`) before storage. An empty title is derived from the first line of code.
+- `SnippetError` uses `thiserror` with variants: `Empty`, `TooLong(usize)`, `StorageUnavailable`, `SerializationFailed`, `NotFound`.
+- `validate_user_snippet(title, code)` is the single validation entry point shared by every store implementation; it returns a snippet with an empty `id` that the store fills before persisting.
 
 ---
 
@@ -130,8 +130,8 @@ pub trait SnippetStore {
   ├── <CodeDisplay />     // renders syntect-highlighted code; overlays cursor marker + wrong-char flash
   ├── <HiddenInput />     // captures on:keydown; kept focused; not visibly rendered as a text box
   └── <StatsBar />        // live WPM, accuracy, error_count
-<SnippetPicker />          // browse embedded snippets by language
-<SnippetImporter />        // paste/upload user code, choose language, save to SnippetStore
+<SnippetPicker />          // browse embedded + user snippets by source
+<SnippetImporter />        // paste Rust code, save to SnippetStore
 <ResultsSummary stats=SessionStats />
 ```
 
@@ -164,13 +164,13 @@ Key implementation constraints:
 - Snippet author guidelines documented (in this file, Section 8) for how embedded snippets should be formatted (`cargo fmt` output only, no trailing whitespace).
 
 ### M4 — User-provided snippets
-- `SnippetImporter` component: paste box + language selector + save.
+- `SnippetImporter` component: paste box + title + save.
 - `localStorage`-backed `SnippetStore` implementation with `SnippetError` handling surfaced in the UI (no silent failures).
-- `SnippetPicker` merges embedded + user snippets, filterable by language and source.
+- `SnippetPicker` merges embedded + user snippets, filterable by source.
 
 ### M5 — Session history
 - Persist `SessionStats` per completed session to `localStorage` (key namespaced separately from snippets, e.g. `rusttype:history:v1`).
-- Simple history view: WPM/accuracy over time, filterable by language.
+- Simple history view: WPM/accuracy over time.
 - Data model versioned so future Supabase sync (see Section 9) can migrate cleanly.
 
 ### M6 — Drill mode
@@ -203,7 +203,7 @@ Key implementation constraints:
 ## 9. Future / Explicitly Deferred
 
 - Supabase sync for cross-device history (pattern already established in other projects; defer until M5 data model is stable).
-- Additional languages beyond Rust for embedded snippets (Python/JS/Go/etc.) — data model already supports it via `Language` enum, just needs content.
+- RustType is deliberately Rust-only. Reintroducing other languages (Python/JS/Go/etc.) would require restoring a language model on `Snippet` — a deliberate, non-trivial decision.
 - Multiplayer/race mode — out of scope, not planned.
 
 ---

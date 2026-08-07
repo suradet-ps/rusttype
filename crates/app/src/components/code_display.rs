@@ -9,13 +9,8 @@ use super::highlight::{HighlightData, ensure_css_injected, get_highlight};
 /// single static text node; only the typed prefix + current character are
 /// re-rendered per keystroke (the affected region).
 #[component]
-pub fn CodeDisplay(
-  code: String,
-  language: snippets::Language,
-  cursor: usize,
-  errors: Vec<usize>,
-) -> impl IntoView {
-  let highlight = get_highlight(&code, language);
+pub fn CodeDisplay(code: String, cursor: usize, errors: Vec<usize>) -> impl IntoView {
+  let highlight = get_highlight(&code);
   ensure_css_injected(&highlight.css);
 
   let chars: Vec<char> = code.chars().collect();

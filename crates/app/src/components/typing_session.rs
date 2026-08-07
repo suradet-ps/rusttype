@@ -27,7 +27,10 @@ fn lock_state(state: &Arc<Mutex<TypingState>>) -> std::sync::MutexGuard<'_, Typi
 }
 
 #[component]
-pub fn TypingSession(snippet: snippets::Snippet) -> impl IntoView {
+pub fn TypingSession(
+  snippet: snippets::Snippet,
+  on_back: impl Fn() + Clone + 'static,
+) -> impl IntoView {
   let code = snippet.code.clone();
   let initial_state = TypingState::new(&code);
   let initial_target = initial_state.target.clone();
@@ -125,13 +128,14 @@ pub fn TypingSession(snippet: snippets::Snippet) -> impl IntoView {
   };
 
   let title = snippet.title.clone();
-  let language = snippet.language;
 
   view! {
       <div class="typing-session">
           <div class="session-header">
+              <button class="btn btn-tertiary btn-sm" on:click=move |_| on_back()>
+                  "All snippets"
+              </button>
               <h2 class="snippet-title">{title}</h2>
-              <span class="snippet-language">{language.display_name()}</span>
           </div>
 
           {move || {
@@ -144,7 +148,6 @@ pub fn TypingSession(snippet: snippets::Snippet) -> impl IntoView {
                       <div class="typing-area">
                           <CodeDisplay
                               code={target_chars.get().into_iter().collect::<String>()}
-                              language=language
                               cursor=cursor.get()
                               errors=wrong_positions.get()
                           />
