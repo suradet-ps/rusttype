@@ -24,9 +24,13 @@ pub struct TypingState {
 
 impl TypingState {
   /// Create a new typing state for the given target string.
+  ///
+  /// Carriage returns are stripped: they are untypeable (Enter produces `\n`)
+  /// and appear in CRLF content pasted on Windows, which would softlock
+  /// strict mode at every newline.
   pub fn new(target: &str) -> Self {
     Self {
-      target: target.chars().collect(),
+      target: target.chars().filter(|c| *c != '\r').collect(),
       cursor: 0,
       error_count: 0,
       started_at_ms: None,
@@ -108,6 +112,17 @@ mod tests {
     assert_eq!(state.cursor, 0);
     assert_eq!(state.error_count, 0);
     assert!(!state.is_complete());
+  }
+
+  #[test]
+  fn crlf_target_normalizes_to_lf() {
+    let mut state = TypingState::new("a\r\nb");
+    assert_eq!(state.target_str(), "a\nb");
+    state.process_key_at('a', 100.0);
+    let result = state.process_key_at('\n', 200.0);
+    assert!(matches!(result, KeyResult::Correct { cursor: 2 }));
+    let result = state.process_key_at('b', 300.0);
+    assert!(matches!(result, KeyResult::Completed { .. }));
   }
 
   #[test]

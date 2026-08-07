@@ -1,0 +1,10 @@
+# Normalize line endings so embedded snippets and sources stay LF on Windows
+# checkouts (CRLF in snippets-data breaks strict-mode typing: '\r' is untypeable).
+* text=auto
+*.rs text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.yml text eol=lf

@@ -111,6 +111,20 @@ mod tests {
   }
 
   #[test]
+  fn embedded_snippets_have_no_carriage_returns() {
+    // CRLF in embedded snippets would softlock strict-mode typing: the
+    // untypeable '\r' would precede every newline.
+    let embedded = EmbeddedSnippets::new();
+    for snippet in embedded.list(None) {
+      assert!(
+        !snippet.code.contains('\r'),
+        "snippet {} contains CR",
+        snippet.id
+      );
+    }
+  }
+
+  #[test]
   fn filter_by_language() {
     let embedded = EmbeddedSnippets::new();
     let rust_only = embedded.list(Some(Language::Rust));
