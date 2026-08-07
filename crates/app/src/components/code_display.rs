@@ -2,6 +2,9 @@ use leptos::prelude::*;
 
 use super::highlight::{HighlightData, ensure_css_injected, get_highlight};
 
+/// DOM id of the current-character span, used for auto-scroll.
+pub const CURRENT_CHAR_ID: &str = "rusttype-current-char";
+
 /// Renders the syntect-highlighted target with cursor and wrong-char overlay.
 ///
 /// Highlighting is cached per snippet (`highlight::get_highlight`), so
@@ -32,12 +35,13 @@ pub fn CodeDisplay(code: String, cursor: usize, errors: Vec<usize>) -> impl Into
               <code>
                   {chars.iter().enumerate().take(tail_start).map(|(i, &ch)| {
                       let class = char_class(i, &chars, cursor, &errors, &highlight);
+                      let span_id = (i == cursor).then_some(CURRENT_CHAR_ID);
                       let display = match ch {
                           '\n' => "↵\n".to_string(),
                           '\t' => "    ".to_string(),
                           other => other.to_string(),
                       };
-                      view! { <span class=class>{display}</span> }
+                      view! { <span id=span_id class=class>{display}</span> }
                   }).collect_view()}
                   <span class="char-tail">{tail_text}</span>
               </code>

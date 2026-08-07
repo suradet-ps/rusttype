@@ -42,6 +42,7 @@ dependencies = [
  "engine",
  "js-sys",
  "leptos",
+ "serde",
  "serde_json",
  "snippets",
  "syntect",

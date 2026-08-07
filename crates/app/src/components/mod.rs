@@ -6,6 +6,7 @@ mod snippet_importer;
 mod snippet_picker;
 mod stats_bar;
 mod typing_session;
+mod virtual_keyboard;
 
 pub use snippet_importer::SnippetImporter;
 pub use snippet_picker::SnippetPicker;

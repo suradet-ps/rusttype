@@ -129,7 +129,8 @@ pub trait SnippetStore {
 <TypingSession snippet=Snippet>
   ├── <CodeDisplay />     // renders syntect-highlighted code; overlays cursor marker + wrong-char flash
   ├── <HiddenInput />     // captures on:keydown; kept focused; not visibly rendered as a text box
-  └── <StatsBar />        // live WPM, accuracy, error_count
+  ├── <StatsBar />        // live WPM, accuracy, error_count
+  └── <VirtualKeyboard /> // optional on-screen QWERTY: finger colours + next-key highlight (settings toggle)
 <SnippetPicker />          // browse embedded + user snippets by source
 <SnippetImporter />        // paste Rust code, save to SnippetStore
 <ResultsSummary stats=SessionStats />
@@ -138,7 +139,9 @@ pub trait SnippetStore {
 Key implementation constraints:
 - Keystroke capture uses `on:keydown` on a focused hidden `<input>`/`<textarea>`, not a global window listener — avoids IME and browser-shortcut collisions.
 - `CodeDisplay` re-renders highlighting spans only for the affected region on each keystroke, not the whole snippet, to keep large snippets responsive.
-- All colors, fonts, and spacing in `CodeDisplay` / `StatsBar` reference `DESIGN.md` tokens by name (e.g. `--color-correct`, `--color-error`, `--font-mono`) — do not hardcode hex values in components.
+- Auto-scroll: the current-char span is anchored at 20% from the left edge of the `.code-display` scroll container and clamped vertically so the typed line stays visible (the pane scrolls both axes internally; the page itself never jumps). Implemented as an `Effect` in `TypingSession` (where the cursor signal lives), keyed off the `rusttype-current-char` DOM id.
+- `VirtualKeyboard` layout data lives in `crate::keyboard` (pure Rust, unit-tested): QWERTY rows, per-finger colour classes (`finger-lp`…`finger-rp`, `{finger.*}` tokens), and `key_id_for_char` mapping target characters to physical keys. QWERTY is a physical-keyboard concern, not a language model — Rust-only stays intact.
+- All colors, fonts, and spacing in `CodeDisplay` / `StatsBar` / `VirtualKeyboard` reference `DESIGN.md` tokens by name (e.g. `--color-correct`, `--color-error`, `--font-mono`) — do not hardcode hex values in components.
 
 ---
 
@@ -167,6 +170,14 @@ Key implementation constraints:
 - `SnippetImporter` component: paste box + title + save.
 - `localStorage`-backed `SnippetStore` implementation with `SnippetError` handling surfaced in the UI (no silent failures).
 - `SnippetPicker` merges embedded + user snippets, filterable by source.
+
+### M4.5 — Typing ergonomics
+- The whole page never scrolls: `.app` is exactly `100vh` with `overflow: hidden`. The typing session is a fixed "board" — header top, `VirtualKeyboard` pinned at the very bottom, and the `.code-display` pane fills the remaining space and scrolls internally (both axes) — long snippets never push the keyboard off-screen. Picker/importer/results views scroll internally too; only the code pane ever moves.
+- Auto-scroll: the code pane scrolls internally (both axes) and is only moved when the cursor char leaves the visible area — horizontally it anchors at 20% from the left edge, vertically it settles near the pane bottom (closest to the keyboard) when scrolling forward. Short snippets are vertically centred in the pane. Implemented as an `Effect` in `TypingSession` keyed off the `rusttype-current-char` DOM id.
+- Keyboard shortcuts: `Tab` restarts the session (unless the next target character is a literal tab, which indentation requires — then it types it); `Esc` returns to the snippet picker. Handled in `HiddenInput` via an `on_shortcut` callback, not global listeners.
+- `VirtualKeyboard`: optional on-screen QWERTY showing per-finger colours and highlighting the key for the next required character. Layout + key mapping live in `crate::keyboard` (pure Rust, unit-tested). QWERTY is a physical-keyboard concern, not a language model — Rust-only stays intact.
+- The keyboard is a user preference persisted in `localStorage` under `rusttype:settings:v1` (default on), versioned and `#[serde(default)]`-growable via `crate::settings`.
+- Wrong-keystroke animations respect `prefers-reduced-motion` (flash/shake disabled).
 
 ### M5 — Session history
 - Persist `SessionStats` per completed session to `localStorage` (key namespaced separately from snippets, e.g. `rusttype:history:v1`).

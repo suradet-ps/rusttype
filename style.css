@@ -20,6 +20,16 @@
     --color-error: #d32f2f;
     --color-error-soft: #ef5350;
 
+    /* Colors — Fingers (touch-typing finger map, {finger.*} tokens) */
+    --finger-left-pinky: #e2725b;
+    --finger-left-ring: #e8a33d;
+    --finger-left-middle: #d9c94f;
+    --finger-left-index: #7fc36b;
+    --finger-right-index: #5bb5d8;
+    --finger-right-middle: #6a8fe8;
+    --finger-right-ring: #9b6ad8;
+    --finger-right-pinky: #d86aa0;
+
     /* Typography */
     --font-display: "Inter", system-ui, sans-serif;
     --font-body: "Inter", system-ui, sans-serif;
@@ -95,14 +105,29 @@ body {
     color: var(--color-body-mid);
 }
 
-/* Main */
+/* Main — the app is a fixed "board": the page never scrolls. */
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
 .main-content {
-    max-width: 960px;
-    margin: 0 auto;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Snippet Picker — content is centred, the page-level scrollbar stays at the
+   right edge of the screen (never inset by the content column). */
+.snippet-picker {
     padding: var(--spacing-3xl) var(--spacing-xl);
 }
 
-/* Snippet Picker */
 .snippet-picker {
     text-align: center;
 }
@@ -200,6 +225,8 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--spacing-lg);
     text-align: left;
+    max-width: 1220px;
+    margin: 0 auto;
 }
 
 .card-wrap {
@@ -339,7 +366,7 @@ body {
 
 .snippet-importer {
     max-width: 640px;
-    margin: 0 auto;
+    margin: var(--spacing-3xl) auto var(--spacing-4xl);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
@@ -414,9 +441,15 @@ body {
 
 /* Typing Session */
 .typing-session {
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xl);
+    padding: var(--spacing-md) var(--spacing-xl) 0;
+    max-width: 960px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .session-header {
@@ -434,10 +467,14 @@ body {
 
 /* Code Display */
 .code-display {
+    flex: 1;
+    min-height: 0;
+    display: flex;
     background-color: var(--color-canvas-soft);
     border-radius: var(--rounded-md);
     padding: var(--spacing-xl);
     overflow-x: auto;
+    overflow-y: auto;
 }
 
 .code-block {
@@ -446,6 +483,8 @@ body {
     line-height: 1.6;
     white-space: pre;
     color: var(--color-ink);
+    margin: auto 0;
+    flex-shrink: 0;
 }
 
 .char {
@@ -556,13 +595,16 @@ body {
     transition: width 0.15s ease;
 }
 
-/* Typing Area */
+/* Typing Area — the code pane scrolls internally; everything else is fixed. */
 .typing-area {
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xl);
     outline: none;
     cursor: text;
+    overflow-y: auto;
 }
 
 .typing-area:focus {
@@ -579,6 +621,8 @@ body {
 
 /* Results Summary */
 .results-summary {
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -587,6 +631,7 @@ body {
     background-color: var(--color-canvas-soft);
     border-radius: var(--rounded-md);
     text-align: center;
+    overflow-y: auto;
 }
 
 .results-title {
@@ -714,6 +759,114 @@ body {
     font-weight: 600;
 }
 
+/* Virtual Keyboard */
+.virtual-keyboard {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-sm) 0;
+    background-color: var(--color-canvas);
+    border-top: 1px solid var(--color-mute);
+    user-select: none;
+}
+
+.kb-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm) var(--spacing-lg);
+    font-size: 12px;
+    color: var(--color-body-mid);
+    padding-bottom: var(--spacing-sm);
+}
+
+.kb-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.kb-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--rounded-full);
+}
+
+.kb-row {
+    display: flex;
+    gap: var(--spacing-xxs);
+}
+
+.kb-key {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    border: 1px solid var(--color-ink);
+    border-radius: var(--rounded-sm);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    transition: background-color 0.1s ease;
+}
+
+.kb-key.kb-special {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-body-mid);
+}
+
+.kb-key.kb-current {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+.kb-key.kb-current .kb-shift-label {
+    color: var(--color-on-primary);
+}
+
+/* Highlight caused by the *shifted* symbol on the key: emphasise the shift
+   label and dim the base label, so the user knows Shift must be held. */
+.kb-key.kb-current-shift .kb-base-label {
+    opacity: 0.4;
+}
+
+.kb-key.kb-current-shift .kb-shift-label {
+    font-weight: 700;
+}
+
+.kb-shift-label {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 9px;
+    color: var(--color-body-mid);
+}
+
+.kb-tab { flex: 1.2; }
+.kb-backspace { flex: 1.5; }
+.kb-enter { flex: 1.6; }
+.kb-shift { flex: 1.5; }
+.kb-space { flex: 12; }
+
+.finger-lp { background-color: var(--finger-left-pinky); }
+.finger-lr { background-color: var(--finger-left-ring); }
+.finger-lm { background-color: var(--finger-left-middle); }
+.finger-li { background-color: var(--finger-left-index); }
+.finger-ri { background-color: var(--finger-right-index); }
+.finger-rm { background-color: var(--finger-right-middle); }
+.finger-rr { background-color: var(--finger-right-ring); }
+.finger-rp { background-color: var(--finger-right-pinky); }
+
 /* Responsive */
 @media (max-width: 768px) {
     .results-grid {
@@ -727,5 +880,17 @@ body {
 
     .snippet-list {
         grid-template-columns: 1fr;
+    }
+
+    .kb-key {
+        height: 32px;
+        font-size: 12px;
+    }
+}
+
+/* Accessibility — respect reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+    .char.char-wrong {
+        animation: none;
     }
 }

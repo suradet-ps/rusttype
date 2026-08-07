@@ -13,7 +13,8 @@ syntect = { version = "5.2", default-features = false, features = ["default-synt
 console_error_panic_hook = "0.1"
 wasm-bindgen = "0.2"
 js-sys = "0.3" # Date::now for user snippet ids
+serde = { version = "1", features = ["derive"] } # Settings persistence
 serde_json = "1" # localStorage persistence format
-web-sys = { version = "0.3", features = ["console", "KeyboardEvent", "Performance", "Storage", "Window"] }
+web-sys = { version = "0.3", features = ["console", "DomRect", "Element", "KeyboardEvent", "Performance", "Storage", "Window"] }
 
 [dev-dependencies]

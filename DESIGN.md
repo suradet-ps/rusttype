@@ -34,6 +34,20 @@ Cards are universally `{rounded.md}` 12 px. Buttons share the same 12 px radius 
 ### Semantic
 The brand doesn't surface a separate semantic palette on its marketing pages. Status / validation cues borrow from the ink + orange hierarchy.
 
+### Finger Colours
+Touch-typing finger map for the on-screen keyboard — one pastel colour per finger (`{finger.*}`). Next-key highlight always uses `{colors.primary}` regardless of finger.
+
+| Token | Finger | Value |
+|---|---|---|
+| `{finger.lp}` | Left pinky | `#e2725b` |
+| `{finger.lr}` | Left ring | `#e8a33d` |
+| `{finger.lm}` | Left middle | `#d9c94f` |
+| `{finger.li}` | Left index | `#7fc36b` |
+| `{finger.ri}` | Right index | `#5bb5d8` |
+| `{finger.rm}` | Right middle | `#6a8fe8` |
+| `{finger.rr}` | Right ring | `#9b6ad8` |
+| `{finger.rp}` | Right pinky | `#d86aa0` |
+
 ## Typography
 
 ### Font Family
@@ -169,6 +183,17 @@ The brand uses illustrative SVGs of zaps / workflows + product screenshots insid
 
 **`footer`** — the dark coffee footer.
 - Background `{colors.ink}`, text `{colors.canvas-soft}`, padding `{spacing.3xl} {spacing.xl}`. Body in `{typography.body-sm}`.
+
+### Typing Surfaces
+
+**`code-display`** — the syntect-highlighted snippet surface.
+- Background `{colors.canvas-soft}`, mono font, `{rounded.md}` 12 px, `{spacing.xl}` 24 px padding. Current character: `{colors.primary}` fill + `{colors.on-primary}` text. Typed characters: `{colors.correct}`. Wrong character: `{colors.error}` fill (wrong whitespace: dashed underline + `{colors.error-soft}` fill). The page never scrolls: the pane fills the space between header and the pinned keyboard and scrolls both axes internally — the current char is anchored at 20% from the left edge and settles near the pane bottom so the line being typed stays close to the keyboard; short snippets are vertically centred in the pane.
+
+**`virtual-keyboard`** — the optional on-screen QWERTY toggle (default on, persisted in settings).
+- One `{finger.*}` colour per key, outline the next required key in `{colors.primary}`; legend row above; Shift symbols as small top-left overlays; keys on `{colors.canvas}` with 1 px `{colors.ink}` hairline borders, `{rounded.sm}` 6 px, mono labels.
+
+**`stats-bar`** — the live WPM / accuracy strip.
+- Background `{colors.canvas-soft}`, `{spacing.md} {spacing.xl}` padding, primary metric in `{colors.ink}`, secondary in `{colors.body-mid}`.
 
 ### Signature Components
 

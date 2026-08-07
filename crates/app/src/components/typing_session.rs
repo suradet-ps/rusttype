@@ -5,10 +5,14 @@ use leptos::prelude::*;
 
 use engine::{KeyResult, TypingState};
 
+use super::code_display::CURRENT_CHAR_ID;
 use super::code_display::CodeDisplay;
 use super::hidden_input::HiddenInput;
+use super::hidden_input::Shortcut;
 use super::results_summary::ResultsSummary;
 use super::stats_bar::StatsBar;
+use super::virtual_keyboard::VirtualKeyboard;
+use crate::settings::Settings;
 
 /// Get current time in milliseconds using `performance.now()`.
 fn now_ms() -> f64 {
@@ -29,7 +33,7 @@ fn lock_state(state: &Arc<Mutex<TypingState>>) -> std::sync::MutexGuard<'_, Typi
 #[component]
 pub fn TypingSession(
   snippet: snippets::Snippet,
-  on_back: impl Fn() + Clone + 'static,
+  on_back: impl Fn() + Clone + Send + Sync + 'static,
 ) -> impl IntoView {
   let code = snippet.code.clone();
   let initial_state = TypingState::new(&code);
@@ -47,6 +51,7 @@ pub fn TypingSession(
   let (completed, set_completed) = signal(false);
   let (session_stats, set_session_stats) = signal(None::<engine::SessionStats>);
   let (wrong_positions, set_wrong_positions) = signal(Vec::<usize>::new());
+  let (show_keyboard, set_show_keyboard) = signal(Settings::load().show_virtual_keyboard);
 
   let total_chars = target_chars.get_untracked().len();
 
@@ -127,6 +132,75 @@ pub fn TypingSession(
     }
   };
 
+  let toggle_keyboard = move || {
+    let next = !show_keyboard.get_untracked();
+    set_show_keyboard.set(next);
+    Settings {
+      show_virtual_keyboard: next,
+    }
+    .save();
+  };
+
+  // The character that still needs typing, for the keyboard overlay.
+  let next_char: Signal<Option<char>> = Memo::new(move |_| {
+    let c = cursor.get();
+    target_chars.get_untracked().get(c).copied()
+  })
+  .into();
+
+  // Tab restarts (unless the next target character is a literal tab, which
+  // real indentation requires); Escape leaves the session.
+  let on_shortcut = {
+    let on_restart = on_restart.clone();
+    let on_back = on_back.clone();
+    move |sc: Shortcut| match sc {
+      Shortcut::Restart => {
+        let c = cursor.get_untracked();
+        if c < total_chars && target_chars.get_untracked()[c] == '\t' {
+          handle_key.run('\t');
+        } else {
+          on_restart();
+        }
+      }
+      Shortcut::Back => on_back(),
+    }
+  };
+
+  // Keep the current character in view while typing long snippets. The code
+  // pane scrolls internally (both axes); we only move it when the cursor char
+  // actually leaves the visible area: horizontally it anchors at 20% from the
+  // left edge, vertically it settles near the pane bottom (closest to the
+  // keyboard) when scrolling forward and near the top when scrolling back.
+  Effect::new(move |_| {
+    let _ = cursor.get();
+    let Some(element) = document().get_element_by_id(CURRENT_CHAR_ID) else {
+      return;
+    };
+    let Ok(Some(container)) = element.closest(".code-display") else {
+      return;
+    };
+    let rect = element.get_bounding_client_rect();
+    let box_rect = container.get_bounding_client_rect();
+    let width = container.client_width() as f64;
+    let height = container.client_height() as f64;
+
+    let left = rect.left() - box_rect.left();
+    let right = rect.right() - box_rect.left();
+    if left < 0.0 || right > width {
+      let target = ((container.scroll_left() as f64) + left - width * 0.2).max(0.0) as i32;
+      container.set_scroll_left(target);
+    }
+
+    let top = rect.top() - box_rect.top();
+    let bottom = rect.bottom() - box_rect.top();
+    if top < 0.0 {
+      container.set_scroll_top(((container.scroll_top() as f64) + top - 24.0).max(0.0) as i32);
+    } else if bottom > height {
+      container
+        .set_scroll_top(((container.scroll_top() as f64) + bottom - height + 24.0).max(0.0) as i32);
+    }
+  });
+
   let title = snippet.title.clone();
 
   view! {
@@ -136,6 +210,9 @@ pub fn TypingSession(
                   "All snippets"
               </button>
               <h2 class="snippet-title">{title}</h2>
+              <button class="btn btn-tertiary btn-sm" on:click=move |_| toggle_keyboard()>
+                  {move || if show_keyboard.get() { "Hide keyboard" } else { "Show keyboard" }}
+              </button>
           </div>
 
           {move || {
@@ -158,7 +235,13 @@ pub fn TypingSession(
                               progress=progress()
                           />
                           <p class="hint">"Click here and start typing"</p>
-                          <HiddenInput on_key=move |ch| handle_key.run(ch) />
+                          {move || {
+                              show_keyboard.get().then(|| view! { <VirtualKeyboard next_char=next_char /> })
+                          }}
+                          <HiddenInput
+                              on_key=move |ch| handle_key.run(ch)
+                              on_shortcut=on_shortcut.clone()
+                          />
                       </div>
                   })
               }

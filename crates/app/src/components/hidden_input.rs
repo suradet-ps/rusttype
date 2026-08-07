@@ -1,13 +1,26 @@
 use leptos::prelude::*;
 
+/// Non-typing shortcuts surfaced by [`HiddenInput`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Shortcut {
+  /// Restart the current snippet (`Tab`).
+  Restart,
+  /// Leave the session (`Escape`).
+  Back,
+}
+
 /// Invisible text input that captures keystrokes.
 ///
 /// Keystrokes are captured via `on:keydown` on this focused, visually hidden
 /// `<input>` — not a global window listener — avoiding IME and browser
-/// shortcut collisions (see AGENTS.md §5). Enter and Tab are translated to
-/// `\n` and `\t` so they type real target characters instead of navigating.
+/// shortcut collisions (see AGENTS.md §5). Enter is translated to `\n` so it
+/// types a real target character. `Tab` and `Escape` are reported via
+/// `on_shortcut` so the session can decide (restart vs. type a literal tab).
 #[component]
-pub fn HiddenInput(on_key: impl Fn(char) + Clone + 'static) -> impl IntoView {
+pub fn HiddenInput(
+  on_key: impl Fn(char) + Clone + 'static,
+  on_shortcut: impl Fn(Shortcut) + Clone + 'static,
+) -> impl IntoView {
   view! {
       <input
           class="hidden-input"
@@ -24,7 +37,11 @@ pub fn HiddenInput(on_key: impl Fn(char) + Clone + 'static) -> impl IntoView {
                   return;
               }
               if key == "Tab" {
-                  on_key('\t');
+                  on_shortcut(Shortcut::Restart);
+                  return;
+              }
+              if key == "Escape" {
+                  on_shortcut(Shortcut::Back);
                   return;
               }
               if !is_printable_key(&key) {
@@ -47,7 +64,6 @@ fn is_printable_key(key: &str) -> bool {
       | "Control"
       | "Alt"
       | "Meta"
-      | "Escape"
       | "ArrowUp"
       | "ArrowDown"
       | "ArrowLeft"

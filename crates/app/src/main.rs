@@ -3,6 +3,8 @@ use leptos::prelude::*;
 use snippets::Snippet;
 
 mod components;
+mod keyboard;
+mod settings;
 mod store;
 
 use components::{SnippetImporter, SnippetPicker, TypingSession};
