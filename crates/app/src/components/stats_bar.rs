@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 
+/// Live statistics bar shown while typing.
 #[component]
 pub fn StatsBar(wpm: f64, accuracy: f64, error_count: usize, progress: f64) -> impl IntoView {
   view! {
@@ -10,7 +11,7 @@ pub fn StatsBar(wpm: f64, accuracy: f64, error_count: usize, progress: f64) -> i
           </div>
           <div class="stat">
               <span class="stat-label">"Accuracy"</span>
-              <span class="stat-value">{format!("{:.1}%", accuracy * 100.0)}</span>
+              <span class="stat-value">{format!("{:.1}%", accuracy)}</span>
           </div>
           <div class="stat">
               <span class="stat-label">"Errors"</span>
