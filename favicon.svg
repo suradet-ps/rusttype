@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E2028" />
+      <stop offset="50%" stop-color="#121318" />
+      <stop offset="100%" stop-color="#08090C" />
+    </linearGradient>
+
+    <!-- Key Highlight / Active Accent Gradient for 'R' -->
+    <linearGradient id="activeKeyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E36" />
+      <stop offset="100%" stop-color="#D02E00" />
+    </linearGradient>
+
+    <!-- Normal Key Gradient -->
+    <linearGradient id="keyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2D313E" />
+      <stop offset="100%" stop-color="#1F222B" />
+    </linearGradient>
+
+    <!-- Base Plate Gradient -->
+    <linearGradient id="plateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#171920" />
+      <stop offset="100%" stop-color="#0D0E12" />
+    </linearGradient>
+
+    <!-- Heavy Drop Shadow -->
+    <filter id="appShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+
+    <!-- Intense Neon Glow for Key 'R' -->
+    <filter id="rGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="7" result="blur1" />
+      <feGaussianBlur stdDeviation="14" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- App Icon Outer Shape (Squircle with metallic border) -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#bgGrad)" stroke="#333846" stroke-width="2" filter="url(#appShadow)" />
+
+  <!-- Background Decorative Grid Lines (Tech Vibe) -->
+  <path d="M 16 80 L 240 80 M 16 176 L 240 176 M 80 16 L 80 240 M 176 16 L 176 240" stroke="#FFFFFF" stroke-opacity="0.03" stroke-width="1" />
+
+  <!-- KEYBOARD BASE PLATE (Center & Scaled to 256px Canvas) -->
+  <g>
+    <!-- Plate Body -->
+    <rect x="28" y="53" width="200" height="150" rx="14" fill="url(#plateGrad)" stroke="#2A2E3D" stroke-width="2" />
+    <rect x="33" y="58" width="190" height="140" rx="10" fill="none" stroke="#000000" stroke-opacity="0.5" stroke-width="1.5" />
+
+    <!-- KEYBOARD KEYS (Row 1) -->
+    <!-- Key 1 -->
+    <rect x="42" y="68" width="35" height="35" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+    <rect x="44" y="69.5" width="31" height="30" rx="4.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="0.5" />
+
+    <!-- Key 2 -->
+    <rect x="83" y="68" width="35" height="35" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+    <rect x="85" y="69.5" width="31" height="30" rx="4.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="0.5" />
+
+    <!-- KEY 3: THE HERO 'R' KEY (Enlarged & Glowing) -->
+    <g filter="url(#rGlow)">
+      <!-- Glow Underlayer -->
+      <rect x="124" y="65" width="40" height="40" rx="7" fill="#FF5E36" opacity="0.45" />
+      <!-- Main Key Body -->
+      <rect x="124" y="66" width="40" height="39" rx="7" fill="url(#activeKeyGrad)" stroke="#FFA085" stroke-width="1.5" />
+      <!-- Inner Bevel Highlight -->
+      <rect x="126.5" y="68" width="35" height="33" rx="5" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.75" />
+      <!-- Key Cap 'R' Text -->
+      <text x="144" y="92.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="21" fill="#FFFFFF" text-anchor="middle" style="letter-spacing: 0.5px;">R</text>
+    </g>
+
+    <!-- Key 4 -->
+    <rect x="170" y="68" width="44" height="35" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+    <rect x="172" y="69.5" width="40" height="30" rx="4.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="0.5" />
+
+    <!-- KEYBOARD KEYS (Row 2) -->
+    <rect x="42" y="109" width="45" height="35" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+    <rect x="93" y="109" width="35" height="35" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+    <rect x="134" y="109" width="35" height="35" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+    <rect x="175" y="109" width="39" height="35" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+
+    <!-- KEYBOARD KEYS (Row 3: Spacebar Row) -->
+    <rect x="42" y="150" width="30" height="34" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+    <!-- Spacebar -->
+    <rect x="78" y="150" width="100" height="34" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+    <rect x="81" y="152" width="94" height="28" rx="4.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="0.5" />
+    <rect x="184" y="150" width="30" height="34" rx="6" fill="url(#keyGrad)" stroke="#3A3F50" stroke-width="0.75" />
+  </g>
+</svg>

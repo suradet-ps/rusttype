@@ -16,7 +16,10 @@ fn App() -> impl IntoView {
   view! {
       <div class="app">
           <header class="nav-bar">
-               <h1 class="nav-title">"RustType"</h1>
+              <div class="nav-brand">
+                  <img class="nav-logo" src="favicon.svg" alt="RustType logo" />
+                  <h1 class="nav-title">"RustType"</h1>
+              </div>
               <p class="nav-subtitle">"Practice typing real code"</p>
           </header>
 
