@@ -57,19 +57,6 @@ already waiting.
 
 ## ◆ ANATOMY
 
-```
-┌──────────────┐     ┌───────────────┐     ┌───────────────┐
-│ SnippetPicker│ ──▶ │ TypingSession │ ──▶ │  ResultsView  │
-│  embedded +  │     │   (the board) │     │   WPM · acc · │
-│  user-saved  │     │       │       │     │   worst tokens│
-└──────────────┘     └───────┼───────┘     └───────────────┘
-                             ▼
-              ┌─────────────────────────────┐
-              │          engine             │
-              │  judges · blocks · counts   │
-              └─────────────────────────────┘
-```
-
 - **Judges** - `engine::TypingState` locks the cursor against the expected
   character. A wrong key is recorded, never forgiven, never skipped.
 - **Indents** - after a correct newline, leading whitespace on the next line
