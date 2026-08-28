@@ -1,96 +1,134 @@
-<div align="center">
-
 # RustType
 
-**A code-typing practice app for Rust developers.**
-
-Built with [Leptos](https://github.com/leptos-rs/leptos) (CSR/WASM) + [syntect](https://github.com/trishume/syntect) syntax highlighting.
-Practice touch-typing real Rust code with strict-mode correctness, per-character error tracking, and WPM/accuracy stats.
-
-[![CI](https://github.com/suradet-ps/rusttype/actions/workflows/ci.yml/badge.svg)](https://github.com/suradet-ps/rusttype/actions)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
-</div>
+```
+   ██████╗ ██╗   ██╗███████╗████████╗████████╗██╗   ██╗██████╗ ███████╗
+   ██╔══██╗██║   ██║██╔════╝╚══██╔══╝╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝
+   ██████╔╝██║   ██║███████╗   ██║      ██║    ╚████╔╝ ██████╔╝█████╗
+   ██╔══██╗██║   ██║╚════██║   ██║      ██║     ╚██╔╝  ██╔══██╗██╔══╝
+   ██║  ██║╚██████╔╝███████║   ██║      ██║      ██║   ██████╔╝███████╗
+   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝      ╚═╝      ╚═╝   ╚═════╝ ╚══════╝
+```
 
 ---
 
-## Features
+## ◆ PULSE
 
-- **Strict Mode** - cursor cannot advance past an incorrect keystroke
-- **Auto-Indent** - IDE-style indentation skip after Enter (no manual spaces/tabs)
-- **Live Stats** - WPM, accuracy, and error count update in real-time
-- **Syntax Highlighting** - powered by `syntect`, code looks like your editor
-- **8 Embedded Snippets** - hand-picked Rust code samples ready to practice
-- **Error Patterns** - worst mistyped tokens surfaced for targeted drills
-- **Zero Dependencies at Runtime** - pure WASM, no backend required
+The keyboard does not negotiate. Every keystroke is judged, and the cursor
+never advances past a mistake. RustType turns real Rust source into a
+discipline drill - your hands learn the language before your mind pretends
+it already knows it.
 
-## Getting Started
+| 0 | 1 | 2 | 3 | | 4 | 5 | 6 | 7 |
+|---|---|---|---|--|---|---|---|---|
+| ▣ | ▣ | ▣ | ▣ | | ☐ | ☐ | ☐ | ☐ |
 
-### Prerequisites
+*Core loop, live stats, wrong-key UX, and indentation rigor are sealed.
+User snippets, session history, drill mode, and export are being forged.*
 
-- [Rust](https://rustup.rs/) (stable, with `wasm32-unknown-unknown` target)
-- [Trunk](https://trunkrs.dev/) (`cargo install trunk`)
+> Compiled with Leptos v0.8 (CSR/WASM), highlighted by `syntect`, judged by
+> a strict-mode engine that lives in pure Rust - no browser, no excuses.
+>
+> **suradet-ps**, artifact keeper
 
-### Setup
+---
 
-```bash
-# Add WASM target
-rustup target add wasm32-unknown-unknown
+## ◆ IGNITION
 
-# Install trunk
-cargo install trunk
+One sequence. Nothing more.
 
-# Run dev server (from repo root)
-trunk serve --port 3000
+```
+⟫ rustup target add wasm32-unknown-unknown
+⟫ cargo install trunk
+⟫ trunk serve --port 3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000). The first snippet is
+already waiting.
 
-## Usage
+<details>
+<summary>Prerequisites</summary>
 
-1. Pick a snippet from the list
-2. Click the typing area to focus
-3. Type the code - strict mode blocks wrong keystrokes
-4. Auto-indent kicks in after each newline
-5. Complete the snippet to see your stats (WPM, accuracy, duration)
+- [Rust](https://rustup.rs/) (stable toolchain, pinned in `rust-toolchain.toml`)
+- [Trunk](https://trunkrs.dev/) - the bundler, installed above
 
-## Tech Stack
+</details>
 
-| Concern | Choice |
-|---|---|
-| UI Framework | Leptos v0.8 (CSR/WASM) |
-| Syntax Highlighting | `syntect` |
-| Serialization | `serde` + `serde_json` |
-| Local Persistence | `localStorage` via `web-sys` |
-| Error Handling | `thiserror` (libraries), `anyhow` (app) |
-| Build Tooling | Trunk |
-| Lint / CI | `cargo fmt`, `cargo clippy -- -D warnings`, `cargo audit` |
+---
 
-## Development
+## ◆ ANATOMY
 
-```bash
-# Run all checks (fmt, clippy, tests)
-cargo fmt --check
-cargo clippy -- -D warnings
-cargo test
-
-# Run WASM dev server (from repo root)
-trunk serve --port 3000
+```
+┌──────────────┐     ┌───────────────┐     ┌───────────────┐
+│ SnippetPicker│ ──▶ │ TypingSession │ ──▶ │  ResultsView  │
+│  embedded +  │     │   (the board) │     │   WPM · acc · │
+│  user-saved  │     │       │       │     │   worst tokens│
+└──────────────┘     └───────┼───────┘     └───────────────┘
+                             ▼
+              ┌─────────────────────────────┐
+              │          engine             │
+              │  judges · blocks · counts   │
+              └─────────────────────────────┘
 ```
 
-## Milestones
+- **Judges** - `engine::TypingState` locks the cursor against the expected
+  character. A wrong key is recorded, never forgiven, never skipped.
+- **Indents** - after a correct newline, leading whitespace on the next line
+  is swallowed for free. No keystrokes, no WPM credit, no mercy on the
+  newline itself.
+- **Measures** - WPM from first keystroke to last correct one; accuracy is
+  attempts against truth. The top mistyped tokens are surfaced for drills.
+- **Remembers** - user snippets and settings live in versioned `localStorage`
+  keys. Nothing leaves your machine; there is no backend to betray you.
 
-| Milestone | Status |
-|---|---|
-| **M0** - Core typing loop (strict mode, auto-indent, embedded snippets) | Done |
-| **M1** - Live stats (WPM, accuracy, progress bar) | Done |
-| **M2** - Wrong-keystroke UX (visual flash, shake) | Done |
-| **M3** - Indentation correctness (auto-indent tests) | Done |
-| **M4** - User-provided snippets (paste + save) | Pending |
-| **M5** - Session history (localStorage) | Pending |
-| **M6** - Drill mode (worst-token practice) | Pending |
-| **M7** - Export results (PNG via Canvas2D) | Pending |
+---
 
-## License
+## ◆ RITUALS
 
-RustType is released under the MIT License.
+**The core ceremony** - every session is the same shape:
+
+1. Pick a snippet. `Tab` at any time restarts it; `Esc` returns to the picker.
+2. Click the board to arm it. The next required character is lit.
+3. Type. Wrong keystrokes flash and are held back - strict mode never blinks.
+4. Cross the final character and the results surface: WPM, accuracy,
+   duration, and the tokens that tripped you.
+
+**The ritual of the wrong key:**
+
+```
+expected:  :
+you sent:  ;
+engine:    [blocked]  error_count: 1  cursor: still here
+```
+
+The cursor stays. The count grows. The muscle memory is yours to build.
+
+---
+
+## ◆ ECHOES
+
+**Where this artifact is heading**
+
+```
+2026 ▸ M4  user-provided snippets ─────────── forging
+     ▸ M5  session history ────────────────── forging
+     ▸ M6  drill mode on worst tokens ─────── forging
+     ▸ M7  export results to PNG ──────────── forging
+```
+
+**Raising the artifact** - issues and pull requests are welcomed under the
+rules in `AGENTS.md`. The engine is pure Rust: `cargo fmt --check`,
+`cargo clippy -- -D warnings`, and `cargo test` must pass before anything
+merges. No `unwrap` outside tests. No exceptions.
+
+**Status** - CI runs every commit: [workflows](.github/workflows).
+
+---
+
+```
+  ─────────────────────────────────────────────────────────
+   The keyboard does not negotiate.
+   Neither should your practice.
+  ─────────────────────────────────────────────────────────
+```
+
+RustType is released under the [MIT License](LICENSE).
