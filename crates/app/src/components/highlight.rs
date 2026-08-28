@@ -3,7 +3,7 @@
 //! Tokenization happens once per snippet (cached) instead of once per
 //! keystroke. The CSS for the fixed theme is generated at runtime from the
 //! embedded `.tmTheme` file (reused from the CodeShot project) and injected
-//! into the document head — no hex values are hardcoded in components, so the
+//! into the document head - no hex values are hardcoded in components, so the
 //! style.css hex-token contract stays intact.
 
 use std::collections::HashMap;

@@ -1,13 +1,13 @@
 :root {
-    /* Colors — Brand & Accent */
+    /* Colors - Brand & Accent */
     --color-primary: #ff4f00;
     --color-on-primary: #fffefb;
 
-    /* Colors — Surface */
+    /* Colors - Surface */
     --color-canvas: #fffefb;
     --color-canvas-soft: #f8f4f0;
 
-    /* Colors — Text */
+    /* Colors - Text */
     --color-ink: #201515;
     --color-ink-soft: #2f2a26;
     --color-ink-mid: #36342e;
@@ -15,12 +15,12 @@
     --color-body-mid: #939084;
     --color-mute: #c5c0b1;
 
-    /* Colors — Semantic */
+    /* Colors - Semantic */
     --color-correct: #2d8a4e;
     --color-error: #d32f2f;
     --color-error-soft: #ef5350;
 
-    /* Colors — Fingers (touch-typing finger map, {finger.*} tokens) */
+    /* Colors - Fingers (touch-typing finger map, {finger.*} tokens) */
     --finger-left-pinky: #e2725b;
     --finger-left-ring: #e8a33d;
     --finger-left-middle: #d9c94f;
@@ -105,7 +105,7 @@ body {
     color: var(--color-body-mid);
 }
 
-/* Main — the app is a fixed "board": the page never scrolls. */
+/* Main - the app is a fixed "board": the page never scrolls. */
 .app {
     display: flex;
     flex-direction: column;
@@ -122,7 +122,7 @@ body {
     overflow-y: auto;
 }
 
-/* Snippet Picker — content is centred, the page-level scrollbar stays at the
+/* Snippet Picker - content is centred, the page-level scrollbar stays at the
    right edge of the screen (never inset by the content column). */
 .snippet-picker {
     padding: var(--spacing-3xl) var(--spacing-xl);
@@ -531,7 +531,7 @@ body {
     75% { transform: translateX(-1px); }
 }
 
-/* Hidden input overlay — captures keystrokes without being visible */
+/* Hidden input overlay - captures keystrokes without being visible */
 .typing-area {
     position: relative;
 }
@@ -595,7 +595,7 @@ body {
     transition: width 0.15s ease;
 }
 
-/* Typing Area — the code pane scrolls internally; everything else is fixed. */
+/* Typing Area - the code pane scrolls internally; everything else is fixed. */
 .typing-area {
     flex: 1;
     min-height: 0;
@@ -888,7 +888,7 @@ body {
     }
 }
 
-/* Accessibility — respect reduced-motion users */
+/* Accessibility - respect reduced-motion users */
 @media (prefers-reduced-motion: reduce) {
     .char.char-wrong {
         animation: none;

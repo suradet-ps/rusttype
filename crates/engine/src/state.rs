@@ -5,7 +5,7 @@ use crate::stats::SessionStats;
 ///
 /// In strict mode, the cursor only advances on correct keystrokes.
 /// Newlines and indentation whitespace are real target characters.
-/// Timestamps are `f64` milliseconds — the caller provides them via `process_key_at`.
+/// Timestamps are `f64` milliseconds - the caller provides them via `process_key_at`.
 #[derive(Debug, Clone)]
 pub struct TypingState {
   /// The target characters to type.
@@ -64,7 +64,7 @@ impl TypingState {
       self.cursor += 1;
 
       // Auto-indent: after a correct newline, skip leading whitespace
-      // on the next line — IDE-style. No keystrokes recorded for skipped
+      // on the next line - IDE-style. No keystrokes recorded for skipped
       // indentation so WPM / accuracy stay honest.
       if expected == '\n' {
         while self.cursor < self.target.len() && matches!(self.target[self.cursor], ' ' | '\t') {

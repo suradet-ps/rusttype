@@ -16,13 +16,13 @@ Practice touch-typing real Rust code with strict-mode correctness, per-character
 
 ## Features
 
-- **Strict Mode** — cursor cannot advance past an incorrect keystroke
-- **Auto-Indent** — IDE-style indentation skip after Enter (no manual spaces/tabs)
-- **Live Stats** — WPM, accuracy, and error count update in real-time
-- **Syntax Highlighting** — powered by `syntect`, code looks like your editor
-- **8 Embedded Snippets** — hand-picked Rust code samples ready to practice
-- **Error Patterns** — worst mistyped tokens surfaced for targeted drills
-- **Zero Dependencies at Runtime** — pure WASM, no backend required
+- **Strict Mode** - cursor cannot advance past an incorrect keystroke
+- **Auto-Indent** - IDE-style indentation skip after Enter (no manual spaces/tabs)
+- **Live Stats** - WPM, accuracy, and error count update in real-time
+- **Syntax Highlighting** - powered by `syntect`, code looks like your editor
+- **8 Embedded Snippets** - hand-picked Rust code samples ready to practice
+- **Error Patterns** - worst mistyped tokens surfaced for targeted drills
+- **Zero Dependencies at Runtime** - pure WASM, no backend required
 
 ## Getting Started
 
@@ -50,7 +50,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 1. Pick a snippet from the list
 2. Click the typing area to focus
-3. Type the code — strict mode blocks wrong keystrokes
+3. Type the code - strict mode blocks wrong keystrokes
 4. Auto-indent kicks in after each newline
 5. Complete the snippet to see your stats (WPM, accuracy, duration)
 
@@ -82,14 +82,14 @@ trunk serve --port 3000
 
 | Milestone | Status |
 |---|---|
-| **M0** — Core typing loop (strict mode, auto-indent, embedded snippets) | Done |
-| **M1** — Live stats (WPM, accuracy, progress bar) | Done |
-| **M2** — Wrong-keystroke UX (visual flash, shake) | Done |
-| **M3** — Indentation correctness (auto-indent tests) | Done |
-| **M4** — User-provided snippets (paste + save) | Pending |
-| **M5** — Session history (localStorage) | Pending |
-| **M6** — Drill mode (worst-token practice) | Pending |
-| **M7** — Export results (PNG via Canvas2D) | Pending |
+| **M0** - Core typing loop (strict mode, auto-indent, embedded snippets) | Done |
+| **M1** - Live stats (WPM, accuracy, progress bar) | Done |
+| **M2** - Wrong-keystroke UX (visual flash, shake) | Done |
+| **M3** - Indentation correctness (auto-indent tests) | Done |
+| **M4** - User-provided snippets (paste + save) | Pending |
+| **M5** - Session history (localStorage) | Pending |
+| **M6** - Drill mode (worst-token practice) | Pending |
+| **M7** - Export results (PNG via Canvas2D) | Pending |
 
 ## License
 

@@ -56,7 +56,7 @@ pub fn ResultsSummary(
                       </div>
                   })
               } else {
-                  Either::Right(view! { <p class="no-errors">"No errors — perfect run!"</p> })
+                  Either::Right(view! { <p class="no-errors">"No errors - perfect run!"</p> })
               }
           }}
 

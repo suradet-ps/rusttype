@@ -76,7 +76,7 @@ pub fn TypingSession(
     set_accuracy.set(acc);
   };
 
-  // The keystroke handler — defined as a plain fn so it can be cloned freely
+  // The keystroke handler - defined as a plain fn so it can be cloned freely
   let handle_key = Callback::new(move |ch: char| {
     if completed.get_untracked() {
       return;

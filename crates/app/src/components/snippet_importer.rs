@@ -27,7 +27,7 @@ pub fn SnippetImporter(on_saved: Callback<()>, on_cancel: Callback<()>) -> impl 
           <p class="eyebrow">"Add your own"</p>
           <h2 class="section-title">"Import a snippet"</h2>
           <p class="picker-subtitle">
-              "Paste any Rust code — it is stored only in this browser (localStorage)."
+              "Paste any Rust code - it is stored only in this browser (localStorage)."
           </p>
 
           <div class="form-field">

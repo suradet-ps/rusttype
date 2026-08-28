@@ -1,6 +1,6 @@
 //! QWERTY keyboard layout data for the on-screen practice keyboard.
 //!
-//! Pure data + pure mapping — no browser APIs, so this module is unit-testable
+//! Pure data + pure mapping - no browser APIs, so this module is unit-testable
 //! without WASM. The layout is a physical-keyboard concern (QWERTY), not a
 //! language model, so RustType stays Rust-only.
 
@@ -154,7 +154,7 @@ pub enum KeyId {
   Tab,
   Enter,
   Space,
-  /// Either shift key — highlighted whenever the next character needs Shift.
+  /// Either shift key - highlighted whenever the next character needs Shift.
   Shift,
 }
 

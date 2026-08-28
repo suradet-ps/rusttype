@@ -34,7 +34,7 @@ pub fn SnippetPicker(
               <p class="eyebrow">"Practice"</p>
               <h2 class="section-title">"Choose a Rust snippet"</h2>
               <p class="picker-subtitle">
-                  "Pick an embedded classic or import your own code — strict mode will keep you honest."
+                  "Pick an embedded classic or import your own code - strict mode will keep you honest."
               </p>
           </div>
 
