@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 pub enum SnippetSource {
   Embedded,
   UserProvided,
+  /// Synthetic drill generated from the user's most-mistyped tokens.
+  Generated,
 }
 
 /// A Rust code snippet for typing practice.

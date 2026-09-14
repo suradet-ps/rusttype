@@ -265,6 +265,64 @@ body {
     margin-bottom: var(--spacing-2xl);
 }
 
+/* Weak-spot drill */
+.drill-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xl);
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto var(--spacing-2xl);
+    padding: var(--spacing-xl);
+    background-color: var(--color-canvas-soft);
+    border-radius: var(--rounded-md);
+    text-align: left;
+}
+
+.drill-copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-width: 0;
+}
+
+.drill-card .eyebrow {
+    margin-bottom: 0;
+}
+
+.drill-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-ink);
+}
+
+.drill-tokens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.drill-token {
+    padding: var(--spacing-xxs) var(--spacing-md);
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-mute);
+    border-radius: var(--rounded-pill);
+}
+
+.drill-token code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink);
+}
+
+.drill-card .btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
 .snippet-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1072,6 +1130,15 @@ body {
 
     .history-count {
         display: none;
+    }
+
+    .drill-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .drill-card .btn {
+        width: 100%;
     }
 
     .results-grid {

@@ -2,8 +2,11 @@
 
 use leptos::either::Either;
 use leptos::prelude::*;
-use snippets::{EmbeddedSnippets, Snippet, SnippetSource, SnippetStore};
+use snippets::{
+  EmbeddedSnippets, Snippet, SnippetSource, SnippetStore, generate_drill, select_tokens,
+};
 
+use crate::history::History;
 use crate::store::LocalSnippetStore;
 
 #[component]
@@ -15,6 +18,13 @@ pub fn SnippetPicker(
 ) -> impl IntoView {
   let (source_filter, set_source_filter) = signal(None::<SnippetSource>);
   let (error, set_error) = signal(None::<String>);
+
+  // Weak-spot drill: built from the tokens the user mistypes most across
+  // their stored sessions. Recomputed whenever the picker mounts, so it
+  // reflects the latest history.
+  let aggregated_tokens = History::load().aggregated_tokens();
+  let drill_tokens = select_tokens(&aggregated_tokens);
+  let drill_snippet = generate_drill(&aggregated_tokens);
 
   let items = Memo::new(move |_| {
     store_version.get();
@@ -37,6 +47,27 @@ pub fn SnippetPicker(
                   "Pick an embedded classic or import your own code - strict mode will keep you honest."
               </p>
           </div>
+
+          {drill_snippet.map(|snippet| {
+              let tokens = drill_tokens.clone();
+              view! {
+                  <div class="drill-card">
+                      <div class="drill-copy">
+                          <p class="eyebrow">"Weak spots"</p>
+                          <h3 class="drill-title">"Drill your most mistyped tokens"</h3>
+                          <div class="drill-tokens">
+                              {tokens.into_iter().map(|token| view! {
+                                  <span class="drill-token"><code>{token}</code></span>
+                              }).collect_view()}
+                          </div>
+                      </div>
+                      <button
+                          class="btn btn-primary"
+                          on:click=move |_| on_select.run(snippet.clone())
+                      >"Practice drill"</button>
+                  </div>
+              }
+          })}
 
           <div class="filter-bar">
               <div class="filter-group">
