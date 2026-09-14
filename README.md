@@ -72,9 +72,9 @@ already waiting.
   canvas at 2x, using the same design tokens as the UI. One click, no server,
   no screenshot.
 - **Challenges** - curated levels cut from real projects, six each from
-  ripgrep, serde, hashbrown, proptest, tokio, axum and leptos to start. Every
-  level carries its source path and license, and pays up to three stars for
-  speed and accuracy. No gates; only stars.
+  ripgrep, serde, hashbrown, proptest, tokio, axum, leptos and sqlx to start.
+  Every level carries its source path and license, and pays up to three stars
+  for speed and accuracy. No gates; only stars.
 
 ---
 
