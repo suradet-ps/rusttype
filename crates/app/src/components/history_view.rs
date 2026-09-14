@@ -74,21 +74,23 @@ pub fn HistoryView(on_back: impl Fn() + Clone + Send + Sync + 'static) -> impl I
                       </div>
 
                       <div class="history-chart" role="img" aria-label="WPM per session">
-                          {chart.iter().map(|record| {
-                              let height = bar_percent(record.wpm, chart_max);
-                              let tooltip = format!(
-                                  "{:.1} WPM, {:.1}% accuracy",
-                                  record.wpm,
-                                  record.accuracy * 100.0,
-                              );
-                              view! {
-                                  <div
-                                      class="history-bar"
-                                      style:height=format!("{height:.1}%")
-                                      title=tooltip
-                                  ></div>
-                              }
-                          }).collect_view()}
+                          <div class="history-bars">
+                              {chart.iter().map(|record| {
+                                  let height = bar_percent(record.wpm, chart_max);
+                                  let tooltip = format!(
+                                      "{:.1} WPM, {:.1}% accuracy",
+                                      record.wpm,
+                                      record.accuracy * 100.0,
+                                  );
+                                  view! {
+                                      <div
+                                          class="history-bar"
+                                          style:height=format!("{height:.1}%")
+                                          title=tooltip
+                                      ></div>
+                                  }
+                              }).collect_view()}
+                          </div>
                       </div>
 
                       <div class="history-list">
