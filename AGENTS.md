@@ -193,6 +193,13 @@ Key implementation constraints:
 - Render a shareable result card (stats + snippet excerpt) to PNG via HTML Canvas2D, reusing the export approach from the CodeShot project.
 - No server round-trip required - client-side render and download only.
 
+### M8 - Challenge levels
+- Curated levels are real Rust excerpts from real projects, copied verbatim under `challenges/<project>/` and embedded at compile time (see `challenges/README.md`). The first set is six ripgrep excerpts (MIT).
+- Every level carries attribution (project, source path, license) and goals, shown to the user.
+- No gating: all levels are open, stars are the collectible. One star for finishing, two at the accuracy goal (`0.97`), three at the level's WPM goal.
+- Best result per level persists in `rusttype:progress:v1`; the session log stays in `rusttype:history:v1`.
+- UI: a separate Challenges view (levels grouped by project, stars and best attempt) with a nav entry; the results screen shows the earned stars for a challenge session.
+
 ---
 
 ## 7. Testing Requirements
@@ -215,6 +222,7 @@ Key implementation constraints:
 ## 9. Future / Explicitly Deferred
 
 - Supabase sync for cross-device history (pattern already established in other projects; defer until M5 data model is stable).
+- Importable challenge packs (the `challenges/` layout and metadata are the format to grow into).
 - RustType is deliberately Rust-only. Reintroducing other languages (Python/JS/Go/etc.) would require restoring a language model on `Snippet` - a deliberate, non-trivial decision.
 - Multiplayer/race mode - out of scope, not planned.
 
