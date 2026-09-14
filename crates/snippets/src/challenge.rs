@@ -1,0 +1,207 @@
+//! Challenge levels: real Rust code from real projects, with goals.
+//!
+//! Levels are embedded at compile time - no network and no runtime manifest.
+//! To add a level, drop the excerpt under `challenges/<project>/` and add one
+//! entry to [`CHALLENGES`]. See `challenges/README.md` for the excerpt rules.
+
+use crate::model::{Snippet, SnippetSource};
+
+/// Minimum accuracy (fraction) for the second star.
+pub const TWO_STAR_ACCURACY: f64 = 0.97;
+
+/// One curated challenge level.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Challenge {
+  /// Snippet id, e.g. `challenge-rg-01`.
+  pub id: &'static str,
+  /// Display title.
+  pub title: &'static str,
+  /// Source project, e.g. `ripgrep`.
+  pub project: &'static str,
+  /// Path of the excerpt inside the source project.
+  pub source_path: &'static str,
+  /// License of the source project.
+  pub license: &'static str,
+  /// Ordering within the challenge list.
+  pub level: u32,
+  /// Accuracy goal (fraction) for the second star.
+  pub accuracy_goal: f64,
+  /// WPM goal for the third star.
+  pub wpm_goal: f64,
+  /// The excerpt itself.
+  pub code: &'static str,
+}
+
+impl Challenge {
+  /// Build the practice snippet for this level.
+  pub fn snippet(&self) -> Snippet {
+    Snippet {
+      id: self.id.to_string(),
+      source: SnippetSource::Challenge,
+      title: self.title.to_string(),
+      code: self.code.trim_end().to_string(),
+    }
+  }
+
+  /// Star rating for a finished attempt.
+  ///
+  /// One star for finishing, two for the accuracy goal, three for also
+  /// reaching the WPM goal.
+  pub fn stars(&self, wpm: f64, accuracy: f64) -> u8 {
+    if accuracy < self.accuracy_goal {
+      return 1;
+    }
+    if wpm >= self.wpm_goal { 3 } else { 2 }
+  }
+}
+
+/// Every embedded level, in level order.
+static CHALLENGES: &[Challenge] = &[
+  Challenge {
+    id: "challenge-rg-01",
+    title: "Byte escapes",
+    project: "ripgrep",
+    source_path: "crates/cli/src/escape.rs",
+    license: "MIT",
+    level: 1,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 25.0,
+    code: include_str!("../../../challenges/ripgrep/01-byte-escapes.rs"),
+  },
+  Challenge {
+    id: "challenge-rg-02",
+    title: "Literal globs",
+    project: "ripgrep",
+    source_path: "crates/globset/src/glob.rs",
+    license: "MIT",
+    level: 2,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 28.0,
+    code: include_str!("../../../challenges/ripgrep/02-literal-globs.rs"),
+  },
+  Challenge {
+    id: "challenge-rg-03",
+    title: "Override matching",
+    project: "ripgrep",
+    source_path: "crates/ignore/src/overrides.rs",
+    license: "MIT",
+    level: 3,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 30.0,
+    code: include_str!("../../../challenges/ripgrep/03-override-matching.rs"),
+  },
+  Challenge {
+    id: "challenge-rg-04",
+    title: "Preceding lines",
+    project: "ripgrep",
+    source_path: "crates/searcher/src/lines.rs",
+    license: "MIT",
+    level: 4,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 33.0,
+    code: include_str!("../../../challenges/ripgrep/04-preceding-lines.rs"),
+  },
+  Challenge {
+    id: "challenge-rg-05",
+    title: "Glob extensions",
+    project: "ripgrep",
+    source_path: "crates/globset/src/glob.rs",
+    license: "MIT",
+    level: 5,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 35.0,
+    code: include_str!("../../../challenges/ripgrep/05-glob-extensions.rs"),
+  },
+  Challenge {
+    id: "challenge-rg-06",
+    title: "Match offsets",
+    project: "ripgrep",
+    source_path: "crates/matcher/src/lib.rs",
+    license: "MIT",
+    level: 6,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 38.0,
+    code: include_str!("../../../challenges/ripgrep/06-match-offsets.rs"),
+  },
+];
+
+/// All levels in level order.
+pub fn all() -> &'static [Challenge] {
+  CHALLENGES
+}
+
+/// Look up a level by snippet id.
+pub fn by_id(id: &str) -> Option<&'static Challenge> {
+  CHALLENGES.iter().find(|challenge| challenge.id == id)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn levels_are_ordered_and_unique() {
+    let levels = all();
+    assert!(!levels.is_empty());
+    let mut ids: Vec<&str> = levels.iter().map(|level| level.id).collect();
+    ids.sort_unstable();
+    ids.dedup();
+    assert_eq!(ids.len(), levels.len(), "ids must be unique");
+    assert!(
+      levels.windows(2).all(|pair| pair[0].level < pair[1].level),
+      "levels must be ordered"
+    );
+  }
+
+  #[test]
+  fn levels_carry_attribution_and_goals() {
+    for level in all() {
+      assert!(level.id.starts_with("challenge-"));
+      assert!(!level.title.is_empty());
+      assert!(!level.project.is_empty());
+      assert!(level.source_path.ends_with(".rs"));
+      assert!(!level.license.is_empty());
+      assert!(level.accuracy_goal > 0.0 && level.accuracy_goal <= 1.0);
+      assert!(level.wpm_goal > 0.0);
+    }
+  }
+
+  #[test]
+  fn level_code_is_a_clean_excerpt() {
+    for level in all() {
+      let lines = level.code.lines().count();
+      assert!(
+        (10..=40).contains(&lines),
+        "{} has {lines} lines, expected 10..=40",
+        level.id
+      );
+      assert!(!level.code.contains('\r'), "{} contains CR", level.id);
+      assert!(!level.code.trim().is_empty());
+    }
+  }
+
+  #[test]
+  fn snippet_maps_the_level() {
+    let level = &all()[0];
+    let snippet = level.snippet();
+    assert_eq!(snippet.id, level.id);
+    assert_eq!(snippet.source, SnippetSource::Challenge);
+    assert_eq!(snippet.title, level.title);
+    assert_eq!(snippet.code, level.code.trim_end());
+  }
+
+  #[test]
+  fn stars_reward_finish_accuracy_and_speed() {
+    let level = &all()[0];
+    assert_eq!(level.stars(level.wpm_goal, 0.5), 1);
+    assert_eq!(level.stars(0.0, level.accuracy_goal), 2);
+    assert_eq!(level.stars(level.wpm_goal, level.accuracy_goal), 3);
+  }
+
+  #[test]
+  fn by_id_finds_levels() {
+    let first = all()[0];
+    assert_eq!(by_id(first.id).map(|level| level.title), Some(first.title));
+    assert!(by_id("challenge-nope").is_none());
+  }
+}
