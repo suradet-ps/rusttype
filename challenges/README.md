@@ -29,3 +29,6 @@ challenges/
 | Project | Levels | License | Source |
 |---|---|---|---|
 | ripgrep | 6 | MIT | https://github.com/BurntSushi/ripgrep |
+
+The ripgrep excerpts are pinned to revision `3fce3b5` (ignore-0.4.33,
+2026-08-04) - the checkout they were copied from.
