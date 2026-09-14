@@ -123,6 +123,72 @@ static CHALLENGES: &[Challenge] = &[
     wpm_goal: 38.0,
     code: include_str!("../../../challenges/ripgrep/06-match-offsets.rs"),
   },
+  Challenge {
+    id: "challenge-serde-01",
+    title: "Size hints",
+    project: "serde",
+    source_path: "serde_core/src/private/size_hint.rs",
+    license: "MIT OR Apache-2.0",
+    level: 1,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 26.0,
+    code: include_str!("../../../challenges/serde/01-size-hints.rs"),
+  },
+  Challenge {
+    id: "challenge-serde-02",
+    title: "Ignored fields",
+    project: "serde",
+    source_path: "serde_core/src/de/ignored_any.rs",
+    license: "MIT OR Apache-2.0",
+    level: 2,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 29.0,
+    code: include_str!("../../../challenges/serde/02-ignored-fields.rs"),
+  },
+  Challenge {
+    id: "challenge-serde-03",
+    title: "Unit deserializer",
+    project: "serde",
+    source_path: "serde_core/src/de/value.rs",
+    license: "MIT OR Apache-2.0",
+    level: 3,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 31.0,
+    code: include_str!("../../../challenges/serde/03-unit-deserializer.rs"),
+  },
+  Challenge {
+    id: "challenge-serde-04",
+    title: "Derive bounds",
+    project: "serde",
+    source_path: "serde_derive/src/bound.rs",
+    license: "MIT OR Apache-2.0",
+    level: 4,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 34.0,
+    code: include_str!("../../../challenges/serde/04-derive-bounds.rs"),
+  },
+  Challenge {
+    id: "challenge-serde-05",
+    title: "Deserialize hints",
+    project: "serde",
+    source_path: "serde_core/src/de/mod.rs",
+    license: "MIT OR Apache-2.0",
+    level: 5,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 36.0,
+    code: include_str!("../../../challenges/serde/05-deserialize-hints.rs"),
+  },
+  Challenge {
+    id: "challenge-serde-06",
+    title: "Content buffer",
+    project: "serde",
+    source_path: "serde_core/src/private/content.rs",
+    license: "MIT OR Apache-2.0",
+    level: 6,
+    accuracy_goal: TWO_STAR_ACCURACY,
+    wpm_goal: 39.0,
+    code: include_str!("../../../challenges/serde/06-content-buffer.rs"),
+  },
 ];
 
 /// All levels in level order.
@@ -140,17 +206,43 @@ mod tests {
   use super::*;
 
   #[test]
-  fn levels_are_ordered_and_unique() {
+  fn levels_are_ordered_within_projects() {
     let levels = all();
     assert!(!levels.is_empty());
     let mut ids: Vec<&str> = levels.iter().map(|level| level.id).collect();
     ids.sort_unstable();
     ids.dedup();
     assert_eq!(ids.len(), levels.len(), "ids must be unique");
-    assert!(
-      levels.windows(2).all(|pair| pair[0].level < pair[1].level),
-      "levels must be ordered"
-    );
+
+    let mut groups: Vec<(&str, Vec<u32>)> = Vec::new();
+    for level in levels {
+      match groups.last_mut() {
+        Some((project, list)) if *project == level.project => list.push(level.level),
+        _ => groups.push((level.project, vec![level.level])),
+      }
+    }
+    for (project, list) in groups {
+      assert_eq!(list[0], 1, "{project} must start at level 01");
+      assert!(
+        list.windows(2).all(|pair| pair[0] < pair[1]),
+        "{project} levels must be ordered"
+      );
+    }
+  }
+
+  #[test]
+  fn each_project_is_one_contiguous_run() {
+    let mut seen: Vec<&str> = Vec::new();
+    for level in all() {
+      if seen.last() != Some(&level.project) {
+        assert!(
+          !seen.contains(&level.project),
+          "{} is split into multiple runs",
+          level.project
+        );
+        seen.push(level.project);
+      }
+    }
   }
 
   #[test]

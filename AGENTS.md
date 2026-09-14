@@ -194,7 +194,7 @@ Key implementation constraints:
 - No server round-trip required - client-side render and download only.
 
 ### M8 - Challenge levels
-- Curated levels are real Rust excerpts from real projects, copied verbatim under `challenges/<project>/` and embedded at compile time (see `challenges/README.md`). The first set is six ripgrep excerpts (MIT).
+- Curated levels are real Rust excerpts from real projects, copied verbatim under `challenges/<project>/` and embedded at compile time (see `challenges/README.md`). The first sets are six ripgrep excerpts (MIT) and six serde excerpts (MIT OR Apache-2.0).
 - Every level carries attribution (project, source path, license) and goals, shown to the user.
 - No gating: all levels are open, stars are the collectible. One star for finishing, two at the accuracy goal (`0.97`), three at the level's WPM goal.
 - Best result per level persists in `rusttype:progress:v1`; the session log stays in `rusttype:history:v1`.
