@@ -14,7 +14,8 @@ use wasm_bindgen::closure::Closure;
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_futures::{JsFuture, spawn_local};
 use web_sys::{
-  Blob, CanvasRenderingContext2d, CssStyleDeclaration, HtmlAnchorElement, HtmlCanvasElement, Url,
+  Blob, CanvasRenderingContext2d, CssStyleDeclaration, Document, HtmlAnchorElement,
+  HtmlCanvasElement, HtmlImageElement, Url,
 };
 
 use crate::components::{HighlightData, get_highlight};
@@ -133,11 +134,12 @@ async fn render_and_download(snippet: &Snippet, stats: &SessionStats) -> Result<
 
   let highlight = get_highlight(&snippet.code);
   let theme = read_theme();
+  let logo = load_logo(&document).await;
   let canvas: HtmlCanvasElement = document
     .create_element("canvas")
     .map_err(js_err)?
     .unchecked_into();
-  draw_card(&canvas, snippet, stats, &highlight, &theme)?;
+  draw_card(&canvas, snippet, stats, &highlight, &theme, logo.as_ref())?;
 
   let blob = canvas_to_blob(&canvas).await?;
   let url = Url::create_object_url_with_blob(&blob).map_err(js_err)?;
@@ -176,6 +178,14 @@ async fn ensure_fonts_ready() {
   }
 }
 
+/// Load the brand favicon used as the card mark.
+async fn load_logo(document: &Document) -> Option<HtmlImageElement> {
+  let image: HtmlImageElement = document.create_element("img").ok()?.unchecked_into();
+  image.set_src("favicon.svg");
+  JsFuture::from(image.decode()).await.ok()?;
+  Some(image)
+}
+
 /// Paint the full card onto `canvas`.
 fn draw_card(
   canvas: &HtmlCanvasElement,
@@ -183,6 +193,7 @@ fn draw_card(
   stats: &SessionStats,
   highlight: &HighlightData,
   theme: &CardTheme,
+  logo: Option<&HtmlImageElement>,
 ) -> Result<(), String> {
   let excerpt = excerpt_runs(
     &snippet.code,
@@ -204,7 +215,7 @@ fn draw_card(
   ctx.scale(SCALE, SCALE).map_err(js_err)?;
 
   draw_background(&ctx, &layout, theme)?;
-  draw_header(&ctx, theme)?;
+  draw_header(&ctx, logo, theme)?;
   draw_title(&ctx, &snippet.title, &layout, theme)?;
   draw_stats(&ctx, stats, &layout, theme)?;
   draw_excerpt(&ctx, &excerpt, highlight, &layout, theme)?;
@@ -234,19 +245,20 @@ fn draw_background(
 }
 
 /// Brand mark, wordmark, tagline and date.
-fn draw_header(ctx: &CanvasRenderingContext2d, theme: &CardTheme) -> Result<(), String> {
-  ctx.set_fill_style_str(&rgb(theme.primary));
-  rounded_rect(ctx, PAD, PAD, LOGO, LOGO, 12.0)?;
-  ctx.fill();
+fn draw_header(
+  ctx: &CanvasRenderingContext2d,
+  logo: Option<&HtmlImageElement>,
+  theme: &CardTheme,
+) -> Result<(), String> {
+  match logo {
+    Some(image) => {
+      ctx
+        .draw_image_with_html_image_element_and_dw_and_dh(image, PAD, PAD, LOGO, LOGO)
+        .map_err(js_err)?;
+    }
+    None => draw_brand_mark(ctx, theme)?,
+  }
 
-  ctx.set_fill_style_str(&rgb(theme.on_primary));
-  ctx.set_font(&format!("700 28px {FONT_DISPLAY}"));
-  ctx.set_text_align("center");
-  ctx.set_text_baseline("middle");
-  fill_text(ctx, "R", PAD + LOGO / 2.0, PAD + LOGO / 2.0 + 1.0)?;
-
-  ctx.set_text_align("left");
-  ctx.set_text_baseline("alphabetic");
   ctx.set_fill_style_str(&rgb(theme.ink));
   ctx.set_font(&format!("600 26px {FONT_DISPLAY}"));
   fill_text(ctx, "RustType", PAD + LOGO + 16.0, PAD + 24.0)?;
@@ -265,6 +277,22 @@ fn draw_header(ctx: &CanvasRenderingContext2d, theme: &CardTheme) -> Result<(), 
   let date = format_date(js_sys::Date::now());
   fill_text(ctx, &date, CARD_WIDTH - PAD, PAD + 30.0)?;
   ctx.set_text_align("left");
+  Ok(())
+}
+
+/// Fallback mark drawn when the favicon cannot be loaded.
+fn draw_brand_mark(ctx: &CanvasRenderingContext2d, theme: &CardTheme) -> Result<(), String> {
+  ctx.set_fill_style_str(&rgb(theme.primary));
+  rounded_rect(ctx, PAD, PAD, LOGO, LOGO, 12.0)?;
+  ctx.fill();
+
+  ctx.set_fill_style_str(&rgb(theme.on_primary));
+  ctx.set_font(&format!("700 28px {FONT_DISPLAY}"));
+  ctx.set_text_align("center");
+  ctx.set_text_baseline("middle");
+  fill_text(ctx, "R", PAD + LOGO / 2.0, PAD + LOGO / 2.0 + 1.0)?;
+  ctx.set_text_align("left");
+  ctx.set_text_baseline("alphabetic");
   Ok(())
 }
 
