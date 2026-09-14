@@ -24,6 +24,26 @@ pub struct HighlightData {
   pub char_classes: Vec<usize>,
   /// CSS rules for each syntax class index.
   pub css: String,
+  /// Canvas-facing color for each syntax class index.
+  pub colors: Vec<TokenColor>,
+}
+
+/// Canvas-facing color for one syntax class.
+///
+/// The DOM consumes [`HighlightData::css`]; canvas consumers cannot use CSS
+/// variables, so the palette is exposed here as plain RGB values.
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub struct TokenColor {
+  /// Red channel.
+  pub r: u8,
+  /// Green channel.
+  pub g: u8,
+  /// Blue channel.
+  pub b: u8,
+  /// Whether the token renders bold.
+  pub bold: bool,
+  /// Whether the token renders italic.
+  pub italic: bool,
 }
 
 /// Packed RGB + font style, deduplicated into a CSS class.
@@ -108,6 +128,16 @@ fn tokenize(code: &str) -> HighlightData {
   HighlightData {
     char_classes,
     css: build_css(&palette),
+    colors: palette
+      .iter()
+      .map(|token| TokenColor {
+        r: token.color.r,
+        g: token.color.g,
+        b: token.color.b,
+        bold: token.bold,
+        italic: token.italic,
+      })
+      .collect(),
   }
 }
 
@@ -174,6 +204,14 @@ mod tests {
     let data = tokenize("fn main() {}\n");
     assert_eq!(data.char_classes.len(), "fn main() {}\n".chars().count());
     assert!(data.char_classes.iter().all(|c| *c < 64));
+  }
+
+  #[test]
+  fn tokenize_exposes_palette_for_every_class() {
+    let data = tokenize("fn main() {}\n");
+    let max_class = data.char_classes.iter().copied().max().unwrap_or(0);
+    assert!(!data.colors.is_empty());
+    assert!(max_class < data.colors.len());
   }
 
   #[test]
