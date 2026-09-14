@@ -31,8 +31,8 @@ challenges/
 | ripgrep | 6 | MIT | https://github.com/BurntSushi/ripgrep |
 | serde | 6 | MIT OR Apache-2.0 | https://github.com/serde-rs/serde |
 | hashbrown | 6 | MIT OR Apache-2.0 | https://github.com/rust-lang/hashbrown |
+| proptest | 6 | MIT OR Apache-2.0 | https://github.com/proptest-rs/proptest |
 
-The ripgrep excerpts are pinned to revision `3fce3b5` (ignore-0.4.33,
-2026-08-04), the serde excerpts to revision `a874a1b` (2026-08-24) and the
-hashbrown excerpts to revision `8710205` (2026-09-06) - the checkouts they
-were copied from.
+The excerpts are pinned to the checkouts they were copied from: ripgrep
+`3fce3b5` (ignore-0.4.33, 2026-08-04), serde `a874a1b` (2026-08-24), hashbrown
+`8710205` (2026-09-06) and proptest `a6f033c` (2026-08-21).
