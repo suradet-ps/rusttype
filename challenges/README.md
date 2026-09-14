@@ -32,7 +32,9 @@ challenges/
 | serde | 6 | MIT OR Apache-2.0 | https://github.com/serde-rs/serde |
 | hashbrown | 6 | MIT OR Apache-2.0 | https://github.com/rust-lang/hashbrown |
 | proptest | 6 | MIT OR Apache-2.0 | https://github.com/proptest-rs/proptest |
+| tokio | 6 | MIT | https://github.com/tokio-rs/tokio |
 
 The excerpts are pinned to the checkouts they were copied from: ripgrep
 `3fce3b5` (ignore-0.4.33, 2026-08-04), serde `a874a1b` (2026-08-24), hashbrown
-`8710205` (2026-09-06) and proptest `a6f033c` (2026-08-21).
+`8710205` (2026-09-06), proptest `a6f033c` (2026-08-21) and tokio `8146318`
+(2026-09-14).
