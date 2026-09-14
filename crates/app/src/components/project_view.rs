@@ -36,7 +36,7 @@ pub fn ProjectView(
               </span>
           </div>
 
-          <div class="challenge-rows">
+          <div class="challenge-levels">
               {levels.into_iter().map(|level| {
                   let best = progress.best(level.id);
                   let stars = stars_label(best.map_or(0, |best| best.stars));
@@ -46,25 +46,25 @@ pub fn ProjectView(
                   );
                   let challenge = *level;
                   view! {
-                      <div class="challenge-row">
-                          <span class="challenge-order">
-                              {format!("{:02}", level.level)}
-                          </span>
-                          <div class="challenge-info">
-                              <span class="challenge-title">{level.title}</span>
-                              <span class="challenge-meta">
-                                  {format!("{} · {}", level.source_path, level.license)}
+                      <button
+                          class="challenge-card"
+                          on:click=move |_| on_start.run(challenge)
+                      >
+                          <span class="challenge-card-top">
+                              <span class="challenge-order">
+                                  {format!("{:02}", level.level)}
                               </span>
-                          </div>
-                          <div class="challenge-result">
                               <span class="challenge-stars">{stars}</span>
+                          </span>
+                          <span class="challenge-title">{level.title}</span>
+                          <span class="challenge-meta">
+                              {format!("{} · {}", level.source_path, level.license)}
+                          </span>
+                          <span class="challenge-card-foot">
                               <span class="challenge-best">{record}</span>
-                          </div>
-                          <button
-                              class="btn btn-primary btn-sm"
-                              on:click=move |_| on_start.run(challenge)
-                          >"Start"</button>
-                      </div>
+                              <span class="challenge-practice">"Start"</span>
+                          </span>
+                      </button>
                   }
               }).collect_view()}
           </div>
