@@ -607,7 +607,7 @@ body {
     line-height: 1.6;
     white-space: pre;
     color: var(--color-ink);
-    margin: auto 0;
+    margin: 0;
     flex-shrink: 0;
 }
 
@@ -843,6 +843,19 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--spacing-md);
+}
+
+.challenge-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.challenge-rating-stars {
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--color-primary);
 }
 
 /* Session History */
@@ -1138,6 +1151,165 @@ body {
 .finger-rr { background-color: var(--finger-right-ring); }
 .finger-rp { background-color: var(--finger-right-pinky); }
 
+/* Challenges */
+.challenges-view {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-3xl) var(--spacing-xl);
+    overflow-y: auto;
+}
+
+.challenges-header {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, auto) 1fr;
+    align-items: center;
+    gap: var(--spacing-lg);
+    width: 100%;
+    max-width: 1220px;
+}
+
+.challenges-header .section-title {
+    margin-bottom: 0;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.challenges-header .btn {
+    justify-self: start;
+    white-space: nowrap;
+}
+
+.challenges-total {
+    justify-self: end;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-body-mid);
+    white-space: nowrap;
+}
+
+.challenges-title-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xxs);
+}
+
+.challenges-subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-body-mid);
+    white-space: nowrap;
+}
+
+.challenge-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+    width: 100%;
+    max-width: 1220px;
+}
+
+.challenge-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    background-color: var(--color-canvas-soft);
+    border: 1px solid var(--color-mute);
+    border-radius: var(--rounded-md);
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    text-align: left;
+    font-family: inherit;
+}
+
+.challenge-card:hover {
+    box-shadow: 0 2px 12px rgba(32, 21, 21, 0.1);
+    transform: translateY(-1px);
+    border-color: var(--color-ink);
+}
+
+.challenge-levels {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    width: 100%;
+    max-width: 1220px;
+}
+
+.challenge-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+}
+
+.challenge-order {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-body-mid);
+}
+
+.challenge-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin-top: auto;
+}
+
+.challenge-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.challenge-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-body-mid);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.challenge-practice {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-primary);
+    white-space: nowrap;
+}
+
+.challenge-stars {
+    color: var(--color-primary);
+    letter-spacing: 1px;
+}
+
+.challenge-best {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-body-mid);
+    white-space: nowrap;
+}
+
+@media (max-width: 1023px) {
+    .challenge-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .challenge-levels {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .nav-subtitle {
@@ -1155,6 +1327,18 @@ body {
 
     .drill-card .btn {
         width: 100%;
+    }
+
+    .challenges-total {
+        display: none;
+    }
+
+    .challenge-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .challenge-levels {
+        grid-template-columns: 1fr;
     }
 
     .results-grid {

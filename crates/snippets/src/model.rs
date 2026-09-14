@@ -7,6 +7,8 @@ pub enum SnippetSource {
   UserProvided,
   /// Synthetic drill generated from the user's most-mistyped tokens.
   Generated,
+  /// Curated challenge level from a real project.
+  Challenge,
 }
 
 /// A Rust code snippet for typing practice.

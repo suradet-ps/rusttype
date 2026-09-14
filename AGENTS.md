@@ -174,7 +174,7 @@ Key implementation constraints:
 
 ### M4.5 - Typing ergonomics
 - The whole page never scrolls: `.app` is exactly `100vh` with `overflow: hidden`. The typing session is a fixed "board" - header top, `VirtualKeyboard` pinned at the very bottom, and the `.code-display` pane fills the remaining space and scrolls internally (both axes) - long snippets never push the keyboard off-screen. Picker/importer/results views scroll internally too; only the code pane ever moves.
-- Auto-scroll: the code pane scrolls internally (both axes) and is only moved when the cursor char leaves the visible area - horizontally it anchors at 20% from the left edge, vertically it settles near the pane bottom (closest to the keyboard) when scrolling forward. Short snippets are vertically centred in the pane. Implemented as an `Effect` in `TypingSession` keyed off the `rusttype-current-char` DOM id.
+- Auto-scroll: the code pane scrolls internally (both axes) and is only moved when the cursor char leaves the comfortable band - horizontally it anchors at 20% from the left edge, vertically it keeps a 35% look-ahead margin below the cursor line (at least 24 px) so the next lines are readable before they are typed. The code always starts at the top of the pane; short snippets simply leave the space below empty. Implemented as an `Effect` in `TypingSession` keyed off the `rusttype-current-char` DOM id.
 - Keyboard shortcuts: `Tab` restarts the session (unless the next target character is a literal tab, which indentation requires - then it types it); `Esc` returns to the snippet picker. Handled in `HiddenInput` via an `on_shortcut` callback, not global listeners.
 - `VirtualKeyboard`: optional on-screen QWERTY showing per-finger colours and highlighting the key for the next required character. Layout + key mapping live in `crate::keyboard` (pure Rust, unit-tested). QWERTY is a physical-keyboard concern, not a language model - Rust-only stays intact.
 - The keyboard is a user preference persisted in `localStorage` under `rusttype:settings:v1` (default on), versioned and `#[serde(default)]`-growable via `crate::settings`.
@@ -192,6 +192,13 @@ Key implementation constraints:
 ### M7 - Export results
 - Render a shareable result card (stats + snippet excerpt) to PNG via HTML Canvas2D, reusing the export approach from the CodeShot project.
 - No server round-trip required - client-side render and download only.
+
+### M8 - Challenge levels
+- Curated levels are real Rust excerpts from real projects, copied verbatim under `challenges/<project>/` and embedded at compile time (see `challenges/README.md`). The first sets are six excerpts each from ripgrep (MIT), serde (MIT OR Apache-2.0), hashbrown (MIT OR Apache-2.0), proptest (MIT OR Apache-2.0), tokio (MIT), axum (MIT), leptos (MIT) and sqlx (MIT OR Apache-2.0).
+- Every level carries attribution (project, source path, license) and goals, shown to the user.
+- No gating: all levels are open, stars are the collectible. One star for finishing, two at the accuracy goal (`0.97`), three at the level's WPM goal.
+- Best result per level persists in `rusttype:progress:v1`; the session log stays in `rusttype:history:v1`.
+- UI: a separate Challenges view (levels grouped by project, stars and best attempt) with a nav entry; the results screen shows the earned stars for a challenge session.
 
 ---
 
@@ -215,6 +222,7 @@ Key implementation constraints:
 ## 9. Future / Explicitly Deferred
 
 - Supabase sync for cross-device history (pattern already established in other projects; defer until M5 data model is stable).
+- Importable challenge packs (the `challenges/` layout and metadata are the format to grow into).
 - RustType is deliberately Rust-only. Reintroducing other languages (Python/JS/Go/etc.) would require restoring a language model on `Snippet` - a deliberate, non-trivial decision.
 - Multiplayer/race mode - out of scope, not planned.
 

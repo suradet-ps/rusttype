@@ -1,15 +1,18 @@
-use leptos::either::Either;
+use leptos::either::EitherOf6;
 use leptos::prelude::*;
-use snippets::Snippet;
+use snippets::{Challenge, Snippet};
 
 mod components;
 mod history;
 mod keyboard;
+mod progress;
 mod settings;
 mod share_card;
 mod store;
 
-use components::{HistoryView, SnippetImporter, SnippetPicker, TypingSession};
+use components::{
+  ChallengesView, HistoryView, ProjectView, SnippetImporter, SnippetPicker, TypingSession,
+};
 
 /// Which screen the app is showing.
 #[derive(Clone)]
@@ -17,7 +20,12 @@ enum View {
   Picker,
   Importer,
   History,
-  Session(Snippet),
+  Challenges,
+  Project(&'static str),
+  Session {
+    snippet: Snippet,
+    challenge: Option<Challenge>,
+  },
 }
 
 #[component]
@@ -26,6 +34,16 @@ fn App() -> impl IntoView {
   let (store_version, set_store_version) = signal(0u32);
 
   let back_to_picker = move || set_view.set(View::Picker);
+  let back_to_challenges = move || set_view.set(View::Challenges);
+  // A challenge session returns to its project; everything else returns to
+  // the picker.
+  let back_from_session = move || match view.get_untracked() {
+    View::Session {
+      challenge: Some(challenge),
+      ..
+    } => set_view.set(View::Project(challenge.project)),
+    _ => set_view.set(View::Picker),
+  };
 
   view! {
       <div class="app">
@@ -39,6 +57,23 @@ fn App() -> impl IntoView {
               </div>
               {move || matches!(view.get(), View::Picker).then(|| view! {
                   <nav class="nav-actions" aria-label="Sections">
+                      <button
+                          class="nav-action"
+                          on:click=move |_| set_view.set(View::Challenges)
+                      >
+                          <svg
+                              class="nav-action-icon"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                          >
+                              <path d="M8 2.5l1.7 3.4 3.8.6-2.75 2.7.65 3.8L8 11.2l-3.4 1.8.65-3.8L2.5 6.5l3.8-.6L8 2.5z"></path>
+                          </svg>
+                          "Challenges"
+                      </button>
                       <button
                           class="nav-action"
                           on:click=move |_| set_view.set(View::History)
@@ -64,7 +99,7 @@ fn App() -> impl IntoView {
 
           <main class="main-content">
               {move || match view.get() {
-                  View::Importer => Either::Left(view! {
+                  View::Importer => EitherOf6::A(view! {
                       <SnippetImporter
                           on_saved=Callback::new(move |()| {
                               set_view.set(View::Picker);
@@ -73,20 +108,47 @@ fn App() -> impl IntoView {
                           on_cancel=Callback::new(move |()| set_view.set(View::Picker))
                       />
                   }),
-                  View::History => Either::Right(Either::Left(view! {
+                  View::History => EitherOf6::B(view! {
                       <HistoryView on_back=back_to_picker />
-                  })),
-                  View::Session(snippet) => Either::Right(Either::Right(Either::Left(view! {
-                      <TypingSession snippet=snippet on_back=back_to_picker />
-                  }))),
-                  View::Picker => Either::Right(Either::Right(Either::Right(view! {
+                  }),
+                  View::Challenges => EitherOf6::C(view! {
+                      <ChallengesView
+                          on_back=back_to_picker
+                          on_open=Callback::new(move |project| set_view.set(View::Project(project)))
+                      />
+                  }),
+                  View::Project(project) => EitherOf6::D(view! {
+                      <ProjectView
+                          project=project
+                          on_back=back_to_challenges
+                          on_start=Callback::new(move |challenge: Challenge| {
+                              set_view.set(View::Session {
+                                  snippet: challenge.snippet(),
+                                  challenge: Some(challenge),
+                              });
+                          })
+                      />
+                  }),
+                  View::Session { snippet, challenge } => EitherOf6::E(view! {
+                      <TypingSession
+                          snippet=snippet
+                          challenge=challenge
+                          on_back=back_from_session
+                      />
+                  }),
+                  View::Picker => EitherOf6::F(view! {
                       <SnippetPicker
-                          on_select=Callback::new(move |snippet| set_view.set(View::Session(snippet)))
+                          on_select=Callback::new(move |snippet| {
+                              set_view.set(View::Session {
+                                  snippet,
+                                  challenge: None,
+                              });
+                          })
                           on_import=Callback::new(move |()| set_view.set(View::Importer))
                           on_changed=Callback::new(move |()| set_store_version.update(|v| *v += 1))
                           store_version=store_version.into()
                       />
-                  }))),
+                  }),
               }}
           </main>
       </div>
