@@ -55,7 +55,8 @@ pub fn ChallengesView(
   }
 }
 
-/// Group levels by project, keeping level order inside each group.
+/// Group levels by project, keeping level order inside each group and
+/// sorting the groups by project name.
 fn group_by_project(levels: &[Challenge]) -> Vec<(&str, Vec<&Challenge>)> {
   let mut groups: Vec<(&str, Vec<&Challenge>)> = Vec::new();
   for level in levels {
@@ -64,6 +65,7 @@ fn group_by_project(levels: &[Challenge]) -> Vec<(&str, Vec<&Challenge>)> {
       _ => groups.push((level.project, vec![level])),
     }
   }
+  groups.sort_by_key(|(project, _)| *project);
   groups
 }
 
@@ -86,19 +88,17 @@ mod tests {
   }
 
   #[test]
-  fn groups_contiguous_projects() {
+  fn groups_projects_sorted_by_name() {
     let levels = [
-      level("a", "one"),
-      level("b", "one"),
-      level("c", "two"),
-      level("d", "one"),
+      level("a", "tokio"),
+      level("b", "serde"),
+      level("c", "serde"),
+      level("d", "axum"),
     ];
     let groups = group_by_project(&levels);
-    assert_eq!(groups.len(), 3);
-    assert_eq!(groups[0].0, "one");
-    assert_eq!(groups[0].1.len(), 2);
-    assert_eq!(groups[1].0, "two");
-    assert_eq!(groups[2].0, "one");
+    let names: Vec<&str> = groups.iter().map(|(project, _)| *project).collect();
+    assert_eq!(names, vec!["axum", "serde", "tokio"]);
+    assert_eq!(groups[1].1.len(), 2);
   }
 
   #[test]
