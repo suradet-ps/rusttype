@@ -20,10 +20,11 @@ it already knows it.
 
 | 0 | 1 | 2 | 3 | | 4 | 5 | 6 | 7 |
 |---|---|---|---|--|---|---|---|---|
-| ▣ | ▣ | ▣ | ▣ | | ☐ | ☐ | ☐ | ☐ |
+| ▣ | ▣ | ▣ | ▣ | | ▣ | ☐ | ☐ | ☐ |
 
-*Core loop, live stats, wrong-key UX, and indentation rigor are sealed.
-User snippets, session history, drill mode, and export are being forged.*
+*Core loop, live stats, wrong-key UX, indentation rigor, user snippets, and
+M4.5 typing ergonomics are sealed. Session history, drill mode, and export
+are being forged.*
 
 > Compiled with Leptos v0.8 (CSR/WASM), highlighted by `syntect`, judged by
 > a strict-mode engine that lives in pure Rust - no browser, no excuses.
@@ -96,10 +97,11 @@ The cursor stays. The count grows. The muscle memory is yours to build.
 **Where this artifact is heading**
 
 ```
-2026 ▸ M4  user-provided snippets ─────────── forging
-     ▸ M5  session history ────────────────── forging
-     ▸ M6  drill mode on worst tokens ─────── forging
-     ▸ M7  export results to PNG ──────────── forging
+2026 ▸ M4   user-provided snippets ────────── sealed
+     ▸ M4.5 typing ergonomics ─────────────── sealed
+     ▸ M5   session history ───────────────── forging
+     ▸ M6   drill mode on worst tokens ────── forging
+     ▸ M7   export results to PNG ─────────── forging
 ```
 
 **Raising the artifact** - issues and pull requests are welcomed under the
