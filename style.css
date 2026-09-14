@@ -838,6 +838,13 @@ body {
     font-weight: 500;
 }
 
+.results-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
 /* Session History */
 .history-view {
     flex: 1;

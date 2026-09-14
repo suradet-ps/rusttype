@@ -6,6 +6,7 @@ mod components;
 mod history;
 mod keyboard;
 mod settings;
+mod share_card;
 mod store;
 
 use components::{HistoryView, SnippetImporter, SnippetPicker, TypingSession};

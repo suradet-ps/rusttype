@@ -13,3 +13,5 @@ pub use history_view::HistoryView;
 pub use snippet_importer::SnippetImporter;
 pub use snippet_picker::SnippetPicker;
 pub use typing_session::TypingSession;
+
+pub(crate) use highlight::{HighlightData, get_highlight};

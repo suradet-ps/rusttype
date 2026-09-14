@@ -47,6 +47,7 @@ dependencies = [
  "snippets",
  "syntect",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
  "web-sys",
 ]
 

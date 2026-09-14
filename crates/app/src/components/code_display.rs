@@ -102,6 +102,7 @@ mod tests {
     HighlightData {
       char_classes: classes,
       css: String::new(),
+      colors: Vec::new(),
     }
   }
 

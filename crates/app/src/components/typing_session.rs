@@ -44,6 +44,7 @@ pub fn TypingSession(
   let restart_state = Arc::clone(&state);
   let stats_state = Arc::clone(&state);
   let record_snippet = snippet.clone();
+  let results_snippet = snippet.clone();
 
   let (target_chars, _set_target) = signal(initial_target);
   let (cursor, set_cursor) = signal(0usize);
@@ -228,7 +229,13 @@ pub fn TypingSession(
           {move || {
               if completed.get() {
                   Either::Left(session_stats.get().map(|stats| {
-                      view! { <ResultsSummary stats=stats on_restart=on_restart.clone() /> }
+                      view! {
+                          <ResultsSummary
+                              stats=stats
+                              snippet=results_snippet.clone()
+                              on_restart=on_restart.clone()
+                          />
+                      }
                   }))
               } else {
                   Either::Right(view! {
