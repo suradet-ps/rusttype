@@ -32,6 +32,27 @@ fn lock_state(state: &Arc<Mutex<TypingState>>) -> std::sync::MutexGuard<'_, Typi
     .expect("invariant: single-threaded WASM, no concurrent panics")
 }
 
+/// Fraction of the code pane kept visible below the cursor line, so the next
+/// lines can be read before they are typed.
+const LOOK_AHEAD_FRACTION: f64 = 0.35;
+
+/// Minimum space kept above the cursor line.
+const TOP_MARGIN: f64 = 24.0;
+
+/// Vertical scroll offset that keeps the cursor line inside the comfortable
+/// band: at least [`TOP_MARGIN`] below the top of the pane, and the look-ahead
+/// margin above the bottom.
+fn next_scroll_top(scroll_top: f64, top: f64, bottom: f64, height: f64) -> f64 {
+  let look_ahead = (height * LOOK_AHEAD_FRACTION).max(TOP_MARGIN);
+  if top < TOP_MARGIN {
+    (scroll_top + top - TOP_MARGIN).max(0.0)
+  } else if bottom + look_ahead > height {
+    (scroll_top + bottom + look_ahead - height).max(0.0)
+  } else {
+    scroll_top
+  }
+}
+
 #[component]
 pub fn TypingSession(
   snippet: snippets::Snippet,
@@ -196,9 +217,9 @@ pub fn TypingSession(
 
   // Keep the current character in view while typing long snippets. The code
   // pane scrolls internally (both axes); we only move it when the cursor char
-  // actually leaves the visible area: horizontally it anchors at 20% from the
-  // left edge, vertically it settles near the pane bottom (closest to the
-  // keyboard) when scrolling forward and near the top when scrolling back.
+  // leaves the comfortable band: horizontally it anchors at 20% from the left
+  // edge, vertically it keeps a look-ahead margin below the cursor so the next
+  // lines are readable before they are typed.
   Effect::new(move |_| {
     let _ = cursor.get();
     let Some(element) = document().get_element_by_id(CURRENT_CHAR_ID) else {
@@ -221,12 +242,8 @@ pub fn TypingSession(
 
     let top = rect.top() - box_rect.top();
     let bottom = rect.bottom() - box_rect.top();
-    if top < 0.0 {
-      container.set_scroll_top(((container.scroll_top() as f64) + top - 24.0).max(0.0) as i32);
-    } else if bottom > height {
-      container
-        .set_scroll_top(((container.scroll_top() as f64) + bottom - height + 24.0).max(0.0) as i32);
-    }
+    let target = next_scroll_top(container.scroll_top() as f64, top, bottom, height);
+    container.set_scroll_top(target as i32);
   });
 
   let title = snippet.title.clone();
@@ -282,5 +299,38 @@ pub fn TypingSession(
               }
           }}
       </div>
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn cursor_inside_the_band_keeps_the_scroll() {
+    assert_eq!(next_scroll_top(100.0, 200.0, 226.0, 600.0), 100.0);
+  }
+
+  #[test]
+  fn cursor_near_the_bottom_leaves_look_ahead() {
+    // A 600 px pane keeps 210 px (35%) below the line: the bottom lands at 390.
+    assert_eq!(next_scroll_top(0.0, 380.0, 406.0, 600.0), 16.0);
+  }
+
+  #[test]
+  fn cursor_above_the_band_scrolls_up() {
+    assert_eq!(next_scroll_top(200.0, 10.0, 36.0, 600.0), 186.0);
+  }
+
+  #[test]
+  fn scroll_never_goes_negative() {
+    assert_eq!(next_scroll_top(0.0, -50.0, -24.0, 600.0), 0.0);
+  }
+
+  #[test]
+  fn short_panes_still_keep_a_margin() {
+    // look_ahead = max(200 * 0.35, 24) = 70.
+    assert_eq!(next_scroll_top(0.0, 100.0, 126.0, 200.0), 0.0);
+    assert_eq!(next_scroll_top(0.0, 120.0, 146.0, 200.0), 16.0);
   }
 }
