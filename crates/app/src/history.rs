@@ -4,6 +4,8 @@
 //! `rusttype:history:v1` key, so a future sync layer can migrate the schema
 //! without guessing at the shape.
 
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::JsValue;
 
@@ -132,6 +134,22 @@ impl History {
   pub fn recent(&self, limit: usize) -> Vec<&SessionRecord> {
     self.sessions.iter().rev().take(limit).collect()
   }
+
+  /// Sum `worst_tokens` counts across every stored session.
+  ///
+  /// Sorted by count (descending) with an alphabetical tie-break, so drill
+  /// generation is deterministic.
+  pub fn aggregated_tokens(&self) -> Vec<(String, usize)> {
+    let mut counts: HashMap<String, usize> = HashMap::new();
+    for session in &self.sessions {
+      for (token, count) in &session.worst_tokens {
+        *counts.entry(token.clone()).or_insert(0) += count;
+      }
+    }
+    let mut tokens: Vec<(String, usize)> = counts.into_iter().collect();
+    tokens.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+    tokens
+  }
 }
 
 /// Access browser localStorage without panicking.
@@ -245,6 +263,32 @@ mod tests {
     let json = serde_json::to_string(&history).expect("history serializes");
     let restored: History = serde_json::from_str(&json).expect("history deserializes");
     assert_eq!(restored, history);
+  }
+
+  #[test]
+  fn aggregated_tokens_sums_across_sessions() {
+    let mut history = History::default();
+    history.push(SessionRecord {
+      worst_tokens: vec![("::".into(), 2), ("et".into(), 1)],
+      ..record(10.0)
+    });
+    history.push(SessionRecord {
+      worst_tokens: vec![("::".into(), 3), ("??".into(), 5)],
+      ..record(20.0)
+    });
+    assert_eq!(
+      history.aggregated_tokens(),
+      vec![
+        ("::".to_string(), 5),
+        ("??".to_string(), 5),
+        ("et".to_string(), 1),
+      ]
+    );
+  }
+
+  #[test]
+  fn aggregated_tokens_empty_history() {
+    assert!(History::default().aggregated_tokens().is_empty());
   }
 
   #[test]
