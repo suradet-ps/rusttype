@@ -20,11 +20,11 @@ it already knows it.
 
 | 0 | 1 | 2 | 3 | | 4 | 5 | 6 | 7 |
 |---|---|---|---|--|---|---|---|---|
-| ▣ | ▣ | ▣ | ▣ | | ▣ | ☐ | ☐ | ☐ |
+| ▣ | ▣ | ▣ | ▣ | | ▣ | ▣ | ☐ | ☐ |
 
-*Core loop, live stats, wrong-key UX, indentation rigor, user snippets, and
-M4.5 typing ergonomics are sealed. Session history, drill mode, and export
-are being forged.*
+*Core loop, live stats, wrong-key UX, indentation rigor, user snippets, M4.5
+typing ergonomics, and session history are sealed. Drill mode and export are
+being forged.*
 
 > Compiled with Leptos v0.8 (CSR/WASM), highlighted by `syntect`, judged by
 > a strict-mode engine that lives in pure Rust - no browser, no excuses.
@@ -65,8 +65,9 @@ already waiting.
   newline itself.
 - **Measures** - WPM from first keystroke to last correct one; accuracy is
   attempts against truth. The top mistyped tokens are surfaced for drills.
-- **Remembers** - user snippets and settings live in versioned `localStorage`
-  keys. Nothing leaves your machine; there is no backend to betray you.
+- **Remembers** - user snippets, settings, and session history live in
+  versioned `localStorage` keys. Nothing leaves your machine; there is no
+  backend to betray you.
 
 ---
 
@@ -99,7 +100,7 @@ The cursor stays. The count grows. The muscle memory is yours to build.
 ```
 2026 ▸ M4   user-provided snippets ────────── sealed
      ▸ M4.5 typing ergonomics ─────────────── sealed
-     ▸ M5   session history ───────────────── forging
+     ▸ M5   session history ───────────────── sealed
      ▸ M6   drill mode on worst tokens ────── forging
      ▸ M7   export results to PNG ─────────── forging
 ```

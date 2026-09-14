@@ -12,6 +12,7 @@ use super::hidden_input::Shortcut;
 use super::results_summary::ResultsSummary;
 use super::stats_bar::StatsBar;
 use super::virtual_keyboard::VirtualKeyboard;
+use crate::history::{History, SessionRecord};
 use crate::settings::Settings;
 
 /// Get current time in milliseconds using `performance.now()`.
@@ -42,6 +43,7 @@ pub fn TypingSession(
   let state = Arc::new(Mutex::new(initial_state));
   let restart_state = Arc::clone(&state);
   let stats_state = Arc::clone(&state);
+  let record_snippet = snippet.clone();
 
   let (target_chars, _set_target) = signal(initial_target);
   let (cursor, set_cursor) = signal(0usize);
@@ -108,6 +110,14 @@ pub fn TypingSession(
         set_wpm.set(stats.wpm);
         set_accuracy.set(stats.accuracy * 100.0);
         set_error_count.set(stats.error_count);
+
+        let mut history = History::load();
+        history.push(SessionRecord::new(
+          &record_snippet,
+          &stats,
+          js_sys::Date::now(),
+        ));
+        history.save();
       }
     }
   });
