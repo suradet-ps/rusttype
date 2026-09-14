@@ -5,6 +5,7 @@ use snippets::Snippet;
 mod components;
 mod history;
 mod keyboard;
+mod progress;
 mod settings;
 mod share_card;
 mod store;
