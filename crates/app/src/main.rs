@@ -1,4 +1,4 @@
-use leptos::either::EitherOf5;
+use leptos::either::EitherOf6;
 use leptos::prelude::*;
 use snippets::{Challenge, Snippet};
 
@@ -10,7 +10,9 @@ mod settings;
 mod share_card;
 mod store;
 
-use components::{ChallengesView, HistoryView, SnippetImporter, SnippetPicker, TypingSession};
+use components::{
+  ChallengesView, HistoryView, ProjectView, SnippetImporter, SnippetPicker, TypingSession,
+};
 
 /// Which screen the app is showing.
 #[derive(Clone)]
@@ -19,6 +21,7 @@ enum View {
   Importer,
   History,
   Challenges,
+  Project(&'static str),
   Session {
     snippet: Snippet,
     challenge: Option<Challenge>,
@@ -31,20 +34,15 @@ fn App() -> impl IntoView {
   let (store_version, set_store_version) = signal(0u32);
 
   let back_to_picker = move || set_view.set(View::Picker);
-  // A challenge session returns to the challenge list; everything else
-  // returns to the picker.
-  let back_from_session = move || {
-    if matches!(
-      view.get_untracked(),
-      View::Session {
-        challenge: Some(_),
-        ..
-      }
-    ) {
-      set_view.set(View::Challenges);
-    } else {
-      set_view.set(View::Picker);
-    }
+  let back_to_challenges = move || set_view.set(View::Challenges);
+  // A challenge session returns to its project; everything else returns to
+  // the picker.
+  let back_from_session = move || match view.get_untracked() {
+    View::Session {
+      challenge: Some(challenge),
+      ..
+    } => set_view.set(View::Project(challenge.project)),
+    _ => set_view.set(View::Picker),
   };
 
   view! {
@@ -101,7 +99,7 @@ fn App() -> impl IntoView {
 
           <main class="main-content">
               {move || match view.get() {
-                  View::Importer => EitherOf5::A(view! {
+                  View::Importer => EitherOf6::A(view! {
                       <SnippetImporter
                           on_saved=Callback::new(move |()| {
                               set_view.set(View::Picker);
@@ -110,12 +108,19 @@ fn App() -> impl IntoView {
                           on_cancel=Callback::new(move |()| set_view.set(View::Picker))
                       />
                   }),
-                  View::History => EitherOf5::B(view! {
+                  View::History => EitherOf6::B(view! {
                       <HistoryView on_back=back_to_picker />
                   }),
-                  View::Challenges => EitherOf5::C(view! {
+                  View::Challenges => EitherOf6::C(view! {
                       <ChallengesView
                           on_back=back_to_picker
+                          on_open=Callback::new(move |project| set_view.set(View::Project(project)))
+                      />
+                  }),
+                  View::Project(project) => EitherOf6::D(view! {
+                      <ProjectView
+                          project=project
+                          on_back=back_to_challenges
                           on_start=Callback::new(move |challenge: Challenge| {
                               set_view.set(View::Session {
                                   snippet: challenge.snippet(),
@@ -124,14 +129,14 @@ fn App() -> impl IntoView {
                           })
                       />
                   }),
-                  View::Session { snippet, challenge } => EitherOf5::D(view! {
+                  View::Session { snippet, challenge } => EitherOf6::E(view! {
                       <TypingSession
                           snippet=snippet
                           challenge=challenge
                           on_back=back_from_session
                       />
                   }),
-                  View::Picker => EitherOf5::E(view! {
+                  View::Picker => EitherOf6::F(view! {
                       <SnippetPicker
                           on_select=Callback::new(move |snippet| {
                               set_view.set(View::Session {

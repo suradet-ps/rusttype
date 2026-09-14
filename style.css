@@ -1191,36 +1191,18 @@ body {
     white-space: nowrap;
 }
 
-.challenge-group {
+.challenges-title-block {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
-    width: 100%;
-    max-width: 960px;
+    align-items: center;
+    gap: var(--spacing-xxs);
 }
 
-.challenge-project-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--spacing-lg);
-}
-
-.challenge-project-stars {
+.challenges-subtitle {
     font-family: var(--font-mono);
     font-size: 12px;
     color: var(--color-body-mid);
     white-space: nowrap;
-}
-
-.challenge-project {
-    font-family: var(--font-display);
-    font-size: 14px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--color-body-mid);
-    text-align: left;
 }
 
 .challenge-cards {
@@ -1249,17 +1231,45 @@ body {
     border-color: var(--color-ink);
 }
 
+.challenge-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.challenge-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: var(--color-canvas-soft);
+    border-radius: var(--rounded-md);
+    text-align: left;
+}
+
+.challenge-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xxs);
+    min-width: 0;
+}
+
+.challenge-result {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-xxs);
+    min-width: 120px;
+}
+
 .challenge-order {
     font-family: var(--font-mono);
     font-size: 13px;
     color: var(--color-body-mid);
-}
-
-.challenge-card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-sm);
 }
 
 .challenge-card-foot {
@@ -1329,6 +1339,21 @@ body {
 
     .challenges-total {
         display: none;
+    }
+
+    .challenge-row {
+        grid-template-columns: auto 1fr;
+        row-gap: var(--spacing-sm);
+    }
+
+    .challenge-result {
+        grid-column: 2;
+        align-items: flex-start;
+    }
+
+    .challenge-row .btn {
+        grid-column: 2;
+        justify-self: start;
     }
 
     .results-grid {

@@ -98,6 +98,14 @@ pub fn stars_label(stars: u8) -> String {
   "★".repeat(filled) + &"☆".repeat(3 - filled)
 }
 
+/// Stars earned across a set of levels.
+pub fn stars_for_levels(progress: &Progress, levels: &[&snippets::Challenge]) -> u32 {
+  levels
+    .iter()
+    .map(|level| progress.best(level.id).map_or(0, |best| best.stars as u32))
+    .sum()
+}
+
 /// An attempt improves when it earns more stars, or the same stars at a
 /// higher WPM.
 fn is_better(candidate: &LevelBest, best: &LevelBest) -> bool {
@@ -182,5 +190,32 @@ mod tests {
     assert_eq!(stars_label(0), "☆☆☆");
     assert_eq!(stars_label(2), "★★☆");
     assert_eq!(stars_label(5), "★★★");
+  }
+
+  #[test]
+  fn stars_for_levels_sums_the_progress() {
+    use snippets::Challenge;
+
+    fn level(id: &'static str) -> Challenge {
+      Challenge {
+        id,
+        title: "Title",
+        project: "demo",
+        source_path: "src/lib.rs",
+        license: "MIT",
+        level: 1,
+        accuracy_goal: 0.97,
+        wpm_goal: 30.0,
+        code: "fn main() {}\n",
+      }
+    }
+
+    let levels = [level("a"), level("b")];
+    let refs: Vec<&Challenge> = levels.iter().collect();
+    let mut progress = Progress::default();
+    progress.record("a", 3, 40.0, 1.0, 1.0);
+    progress.record("b", 2, 30.0, 0.98, 2.0);
+    assert_eq!(stars_for_levels(&progress, &refs), 5);
+    assert_eq!(stars_for_levels(&Progress::default(), &refs), 0);
   }
 }

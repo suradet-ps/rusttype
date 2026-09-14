@@ -1,14 +1,14 @@
-//! Challenge levels: curated real-world code with star goals.
+//! Challenge projects: one card per source project.
 
 use leptos::prelude::*;
 use snippets::{Challenge, all_challenges};
 
-use crate::progress::{Progress, stars_label};
+use crate::progress::{Progress, stars_for_levels};
 
 #[component]
 pub fn ChallengesView(
   on_back: impl Fn() + Clone + Send + Sync + 'static,
-  on_start: Callback<Challenge>,
+  on_open: Callback<&'static str>,
 ) -> impl IntoView {
   let progress = Progress::load();
   let total_stars = progress.total_stars();
@@ -27,54 +27,30 @@ pub fn ChallengesView(
               </span>
           </div>
 
-          {groups.into_iter().map(|(project, levels)| {
-              let project_stars = stars_for_levels(&progress, &levels);
-              let project_max = levels.len() as u32 * 3;
-              view! {
-                  <section class="challenge-group">
-                      <div class="challenge-project-header">
-                          <h3 class="challenge-project">{project}</h3>
-                          <span class="challenge-project-stars">
-                              {format!("{project_stars} / {project_max} ★")}
+          <div class="challenge-cards">
+              {groups.into_iter().map(|(project, levels)| {
+                  let project_stars = stars_for_levels(&progress, &levels);
+                  let project_max = levels.len() as u32 * 3;
+                  let license = levels.first().map_or("", |level| level.license);
+                  view! {
+                      <button
+                          class="challenge-card"
+                          on:click=move |_| on_open.run(project)
+                      >
+                          <span class="challenge-title">{project}</span>
+                          <span class="challenge-meta">
+                              {format!("{} levels · {license}", levels.len())}
                           </span>
-                      </div>
-                      <div class="challenge-cards">
-                          {levels.into_iter().map(|level| {
-                              let best = progress.best(level.id);
-                              let stars = stars_label(best.map_or(0, |best| best.stars));
-                              let record = best.map_or_else(
-                                  || "Not attempted".to_string(),
-                                  |best| {
-                                      format!("{:.1} WPM · {:.1}%", best.wpm, best.accuracy * 100.0)
-                                  },
-                              );
-                              let challenge = *level;
-                              view! {
-                                  <button
-                                      class="challenge-card"
-                                      on:click=move |_| on_start.run(challenge)
-                                  >
-                                      <span class="challenge-card-top">
-                                          <span class="challenge-order">
-                                              {format!("{:02}", level.level)}
-                                          </span>
-                                          <span class="challenge-stars">{stars}</span>
-                                      </span>
-                                      <span class="challenge-title">{level.title}</span>
-                                      <span class="challenge-meta">
-                                          {format!("{} · {}", level.source_path, level.license)}
-                                      </span>
-                                      <span class="challenge-card-foot">
-                                          <span class="challenge-best">{record}</span>
-                                          <span class="challenge-practice">"Practice"</span>
-                                      </span>
-                                  </button>
-                              }
-                          }).collect_view()}
-                      </div>
-                  </section>
-              }
-          }).collect_view()}
+                          <span class="challenge-card-foot">
+                              <span class="challenge-best">
+                                  {format!("{project_stars} / {project_max} ★")}
+                              </span>
+                              <span class="challenge-practice">"Open"</span>
+                          </span>
+                      </button>
+                  }
+              }).collect_view()}
+          </div>
       </div>
   }
 }
@@ -89,14 +65,6 @@ fn group_by_project(levels: &[Challenge]) -> Vec<(&str, Vec<&Challenge>)> {
     }
   }
   groups
-}
-
-/// Stars earned across one project's levels.
-fn stars_for_levels(progress: &Progress, levels: &[&Challenge]) -> u32 {
-  levels
-    .iter()
-    .map(|level| progress.best(level.id).map_or(0, |best| best.stars as u32))
-    .sum()
 }
 
 #[cfg(test)]
@@ -136,16 +104,5 @@ mod tests {
   #[test]
   fn empty_input_has_no_groups() {
     assert!(group_by_project(&[]).is_empty());
-  }
-
-  #[test]
-  fn project_stars_sum_the_progress() {
-    let levels = [level("a", "one"), level("b", "one")];
-    let refs: Vec<&Challenge> = levels.iter().collect();
-    let mut progress = Progress::default();
-    progress.record("a", 3, 40.0, 1.0, 1.0);
-    progress.record("b", 2, 30.0, 0.98, 2.0);
-    assert_eq!(stars_for_levels(&progress, &refs), 5);
-    assert_eq!(stars_for_levels(&Progress::default(), &refs), 0);
   }
 }
