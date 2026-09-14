@@ -900,23 +900,32 @@ body {
 }
 
 .history-chart {
-    display: flex;
-    align-items: flex-end;
-    gap: var(--spacing-xs);
     width: 100%;
     max-width: 720px;
-    height: 160px;
     padding: var(--spacing-lg);
     background-color: var(--color-canvas-soft);
     border-radius: var(--rounded-md);
     overflow-x: auto;
 }
 
+.history-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing-xs);
+    height: 112px;
+    border-bottom: 1px solid var(--color-mute);
+}
+
 .history-bar {
-    flex: 1 0 8px;
+    flex: 0 0 16px;
     min-height: 2px;
     background-color: var(--color-primary);
     border-radius: var(--rounded-sm) var(--rounded-sm) 0 0;
+    transition: opacity 0.15s ease;
+}
+
+.history-bar:hover {
+    opacity: 0.85;
 }
 
 .history-list {
