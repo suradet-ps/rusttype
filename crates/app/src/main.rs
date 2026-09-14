@@ -125,7 +125,11 @@ fn App() -> impl IntoView {
                       />
                   }),
                   View::Session { snippet, challenge } => EitherOf5::D(view! {
-                      <TypingSession snippet=snippet on_back=back_from_session />
+                      <TypingSession
+                          snippet=snippet
+                          challenge=challenge
+                          on_back=back_from_session
+                      />
                   }),
                   View::Picker => EitherOf5::E(view! {
                       <SnippetPicker

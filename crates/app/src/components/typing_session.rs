@@ -13,6 +13,7 @@ use super::results_summary::ResultsSummary;
 use super::stats_bar::StatsBar;
 use super::virtual_keyboard::VirtualKeyboard;
 use crate::history::{History, SessionRecord};
+use crate::progress::Progress;
 use crate::settings::Settings;
 
 /// Get current time in milliseconds using `performance.now()`.
@@ -34,6 +35,7 @@ fn lock_state(state: &Arc<Mutex<TypingState>>) -> std::sync::MutexGuard<'_, Typi
 #[component]
 pub fn TypingSession(
   snippet: snippets::Snippet,
+  challenge: Option<snippets::Challenge>,
   on_back: impl Fn() + Clone + Send + Sync + 'static,
 ) -> impl IntoView {
   let code = snippet.code.clone();
@@ -53,6 +55,7 @@ pub fn TypingSession(
   let (accuracy, set_accuracy) = signal(100.0f64);
   let (completed, set_completed) = signal(false);
   let (session_stats, set_session_stats) = signal(None::<engine::SessionStats>);
+  let (earned_stars, set_earned_stars) = signal(None::<u8>);
   let (wrong_positions, set_wrong_positions) = signal(Vec::<usize>::new());
   let (show_keyboard, set_show_keyboard) = signal(Settings::load().show_virtual_keyboard);
 
@@ -105,6 +108,19 @@ pub fn TypingSession(
         set_live_stats();
       }
       KeyResult::Completed { stats } => {
+        if let Some(challenge) = &challenge {
+          let stars = challenge.stars(stats.wpm, stats.accuracy);
+          let mut progress = Progress::load();
+          progress.record(
+            challenge.id,
+            stars,
+            stats.wpm,
+            stats.accuracy,
+            js_sys::Date::now(),
+          );
+          progress.save();
+          set_earned_stars.set(Some(stars));
+        }
         set_cursor.set(total_chars);
         set_completed.set(true);
         set_session_stats.set(Some(stats.clone()));
@@ -138,6 +154,7 @@ pub fn TypingSession(
       set_accuracy.set(100.0);
       set_completed.set(false);
       set_session_stats.set(None);
+      set_earned_stars.set(None);
       set_wrong_positions.set(Vec::new());
       *lock_state(&restart_state) = TypingState::new(&code);
     }
@@ -233,6 +250,7 @@ pub fn TypingSession(
                           <ResultsSummary
                               stats=stats
                               snippet=results_snippet.clone()
+                              stars=earned_stars.get()
                               on_restart=on_restart.clone()
                           />
                       }

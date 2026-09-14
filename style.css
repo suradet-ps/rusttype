@@ -845,6 +845,19 @@ body {
     gap: var(--spacing-md);
 }
 
+.challenge-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.challenge-rating-stars {
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--color-primary);
+}
+
 /* Session History */
 .history-view {
     flex: 1;

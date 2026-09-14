@@ -1,12 +1,14 @@
 use leptos::either::Either;
 use leptos::prelude::*;
 
+use crate::progress::stars_label;
 use crate::share_card::export_results_png;
 
 #[component]
 pub fn ResultsSummary(
   stats: engine::SessionStats,
   snippet: snippets::Snippet,
+  stars: Option<u8>,
   on_restart: impl Fn() + Clone + 'static,
 ) -> impl IntoView {
   let worst_tokens = stats.worst_tokens.clone();
@@ -58,6 +60,13 @@ pub fn ResultsSummary(
                   <span class="result-value">{duration}</span>
               </div>
           </div>
+
+          {stars.map(|stars| view! {
+              <div class="challenge-rating">
+                  <span class="result-label">"Challenge rating"</span>
+                  <span class="challenge-rating-stars">{stars_label(stars)}</span>
+              </div>
+          })}
 
           {move || {
               if has_tokens {
