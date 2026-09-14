@@ -20,10 +20,10 @@ it already knows it.
 
 | 0 | 1 | 2 | 3 | | 4 | 5 | 6 | 7 |
 |---|---|---|---|--|---|---|---|---|
-| ▣ | ▣ | ▣ | ▣ | | ▣ | ▣ | ☐ | ☐ |
+| ▣ | ▣ | ▣ | ▣ | | ▣ | ▣ | ▣ | ☐ |
 
 *Core loop, live stats, wrong-key UX, indentation rigor, user snippets, M4.5
-typing ergonomics, and session history are sealed. Drill mode and export are
+typing ergonomics, session history, and drill mode are sealed. Export is
 being forged.*
 
 > Compiled with Leptos v0.8 (CSR/WASM), highlighted by `syntect`, judged by
@@ -101,7 +101,7 @@ The cursor stays. The count grows. The muscle memory is yours to build.
 2026 ▸ M4   user-provided snippets ────────── sealed
      ▸ M4.5 typing ergonomics ─────────────── sealed
      ▸ M5   session history ───────────────── sealed
-     ▸ M6   drill mode on worst tokens ────── forging
+     ▸ M6   drill mode on worst tokens ────── sealed
      ▸ M7   export results to PNG ─────────── forging
 ```
 
