@@ -516,10 +516,6 @@ body {
     border-radius: 2px;
 }
 
-.char-tail {
-    color: var(--color-ink-mid);
-}
-
 @keyframes flash {
     0%, 100% { background-color: var(--color-error); }
     50% { background-color: var(--color-error-soft); }

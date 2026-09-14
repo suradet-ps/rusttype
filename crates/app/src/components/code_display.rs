@@ -8,9 +8,9 @@ pub const CURRENT_CHAR_ID: &str = "rusttype-current-char";
 /// Renders the syntect-highlighted target with cursor and wrong-char overlay.
 ///
 /// Highlighting is cached per snippet (`highlight::get_highlight`), so
-/// keystrokes never re-tokenize the whole snippet. The untyped tail is a
-/// single static text node; only the typed prefix + current character are
-/// re-rendered per keystroke (the affected region).
+/// keystrokes never re-tokenize the whole snippet. The untyped tail is one
+/// static span per run of same-class characters; only the typed prefix +
+/// current character re-render per keystroke (the affected region).
 #[component]
 pub fn CodeDisplay(code: String, cursor: usize, errors: Vec<usize>) -> impl IntoView {
   let highlight = get_highlight(&code);
@@ -20,14 +20,7 @@ pub fn CodeDisplay(code: String, cursor: usize, errors: Vec<usize>) -> impl Into
   let typed_count = cursor.min(chars.len());
   let tail_start = typed_count + 1;
 
-  let mut tail_text = String::new();
-  for ch in chars.iter().skip(tail_start) {
-    match ch {
-      '\t' => tail_text.push_str("    "),
-      '\n' => tail_text.push('\n'),
-      other => tail_text.push(*other),
-    }
-  }
+  let tail = tail_runs(&chars, tail_start, &highlight);
 
   view! {
       <div class="code-display">
@@ -43,11 +36,34 @@ pub fn CodeDisplay(code: String, cursor: usize, errors: Vec<usize>) -> impl Into
                       };
                       view! { <span id=span_id class=class>{display}</span> }
                   }).collect_view()}
-                  <span class="char-tail">{tail_text}</span>
+                  {tail.into_iter().map(|(tok, text)| {
+                      let class = format!("tok-{tok}");
+                      view! { <span class=class>{text}</span> }
+                  }).collect_view()}
               </code>
           </pre>
       </div>
   }
+}
+
+/// Group the untyped tail into runs of consecutive characters that share a
+/// syntax class, so the tail stays syntax-colored without one DOM node per
+/// character. Tabs and newlines expand exactly as in the typed prefix.
+fn tail_runs(chars: &[char], tail_start: usize, highlight: &HighlightData) -> Vec<(usize, String)> {
+  let mut runs: Vec<(usize, String)> = Vec::new();
+  for (index, &ch) in chars.iter().enumerate().skip(tail_start) {
+    let tok = highlight.char_classes.get(index).copied().unwrap_or(0);
+    let display = match ch {
+      '\n' => "\n".to_string(),
+      '\t' => "    ".to_string(),
+      other => other.to_string(),
+    };
+    match runs.last_mut() {
+      Some((last_tok, text)) if *last_tok == tok => text.push_str(&display),
+      _ => runs.push((tok, display)),
+    }
+  }
+  runs
 }
 
 /// CSS class for a single character combining syntax, state, and wrong-type.
@@ -76,4 +92,46 @@ fn char_class(
     "char"
   };
   format!("{tok} {state}")
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn highlight_with(classes: Vec<usize>) -> HighlightData {
+    HighlightData {
+      char_classes: classes,
+      css: String::new(),
+    }
+  }
+
+  #[test]
+  fn tail_runs_groups_consecutive_classes() {
+    let chars: Vec<char> = "fn main() {}".chars().collect();
+    let data = highlight_with(vec![0, 0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3]);
+    let runs = tail_runs(&chars, 4, &data);
+    assert_eq!(
+      runs,
+      vec![
+        (1, "ain".to_string()),
+        (2, "()".to_string()),
+        (3, " {}".to_string()),
+      ]
+    );
+  }
+
+  #[test]
+  fn tail_runs_expands_tabs_and_newlines() {
+    let chars: Vec<char> = "a\tb\nc".chars().collect();
+    let data = highlight_with(vec![0, 0, 0, 0, 0]);
+    let runs = tail_runs(&chars, 0, &data);
+    assert_eq!(runs, vec![(0, "a    b\nc".to_string())]);
+  }
+
+  #[test]
+  fn tail_runs_empty_when_cursor_at_end() {
+    let chars: Vec<char> = "fn".chars().collect();
+    let data = highlight_with(vec![0, 0]);
+    assert!(tail_runs(&chars, 2, &data).is_empty());
+  }
 }
