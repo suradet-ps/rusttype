@@ -20,11 +20,10 @@ it already knows it.
 
 | 0 | 1 | 2 | 3 | | 4 | 5 | 6 | 7 |
 |---|---|---|---|--|---|---|---|---|
-| ▣ | ▣ | ▣ | ▣ | | ▣ | ▣ | ▣ | ☐ |
+| ▣ | ▣ | ▣ | ▣ | | ▣ | ▣ | ▣ | ▣ |
 
 *Core loop, live stats, wrong-key UX, indentation rigor, user snippets, M4.5
-typing ergonomics, session history, and drill mode are sealed. Export is
-being forged.*
+typing ergonomics, session history, drill mode, and export are sealed.*
 
 > Compiled with Leptos v0.8 (CSR/WASM), highlighted by `syntect`, judged by
 > a strict-mode engine that lives in pure Rust - no browser, no excuses.
@@ -68,6 +67,9 @@ already waiting.
 - **Remembers** - user snippets, settings, and session history live in
   versioned `localStorage` keys. Nothing leaves your machine; there is no
   backend to betray you.
+- **Shares** - the finished session renders to a PNG card on an off-screen
+  canvas at 2x, using the same design tokens as the UI. One click, no server,
+  no screenshot.
 
 ---
 
@@ -102,8 +104,10 @@ The cursor stays. The count grows. The muscle memory is yours to build.
      ▸ M4.5 typing ergonomics ─────────────── sealed
      ▸ M5   session history ───────────────── sealed
      ▸ M6   drill mode on worst tokens ────── sealed
-     ▸ M7   export results to PNG ─────────── forging
+     ▸ M7   export results to PNG ─────────── sealed
 ```
+
+*Every milestone is sealed - the rest is practice.*
 
 **Raising the artifact** - issues and pull requests are welcomed under the
 rules in `AGENTS.md`. The engine is pure Rust: `cargo fmt --check`,
