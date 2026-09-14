@@ -3,6 +3,7 @@ use leptos::prelude::*;
 use snippets::Snippet;
 
 mod components;
+mod history;
 mod keyboard;
 mod settings;
 mod store;
