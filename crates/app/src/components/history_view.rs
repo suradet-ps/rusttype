@@ -19,6 +19,11 @@ pub fn HistoryView(on_back: impl Fn() + Clone + Send + Sync + 'static) -> impl I
   let best_wpm = format!("{:.1}", history.best_wpm());
   let average_wpm = format!("{:.1}", history.average_wpm());
   let average_accuracy = format!("{:.1}%", history.average_accuracy() * 100.0);
+  let session_label = if total == 1 {
+    "1 session".to_string()
+  } else {
+    format!("{total} sessions")
+  };
 
   let chart_max = history.best_wpm();
   let chart: Vec<SessionRecord> = history
@@ -36,6 +41,7 @@ pub fn HistoryView(on_back: impl Fn() + Clone + Send + Sync + 'static) -> impl I
                   "All snippets"
               </button>
               <h2 class="section-title">"Session history"</h2>
+              <span class="history-count">{session_label}</span>
           </div>
 
           {move || {

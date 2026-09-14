@@ -30,17 +30,34 @@ fn App() -> impl IntoView {
       <div class="app">
           <header class="nav-bar">
               <div class="nav-brand">
-                  <img class="nav-logo" src="favicon.svg" alt="RustType logo" />
-                  <h1 class="nav-title">"RustType"</h1>
-              </div>
-              <p class="nav-subtitle">"Practice typing real code"</p>
-              {move || matches!(view.get(), View::Picker).then(|| view! {
-                  <div class="nav-actions">
-                      <button
-                          class="btn btn-tertiary btn-sm"
-                          on:click=move |_| set_view.set(View::History)
-                      >"History"</button>
+                  <img class="nav-logo" src="favicon.svg" alt="" />
+                  <div class="nav-brand-text">
+                      <h1 class="nav-title">"RustType"</h1>
+                      <p class="nav-subtitle">"Practice typing real code"</p>
                   </div>
+              </div>
+              {move || matches!(view.get(), View::Picker).then(|| view! {
+                  <nav class="nav-actions" aria-label="Sections">
+                      <button
+                          class="nav-action"
+                          on:click=move |_| set_view.set(View::History)
+                      >
+                          <svg
+                              class="nav-action-icon"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                          >
+                              <circle cx="8" cy="8" r="6.25"></circle>
+                              <path d="M8 4.5V8l2.5 1.5"></path>
+                          </svg>
+                          "History"
+                      </button>
+                  </nav>
               })}
           </header>
 
