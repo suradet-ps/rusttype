@@ -36,9 +36,10 @@ challenges/
 | axum | 6 | MIT | https://github.com/tokio-rs/axum |
 | leptos | 6 | MIT | https://github.com/leptos-rs/leptos |
 | sqlx | 6 | MIT OR Apache-2.0 | https://github.com/launchbadge/sqlx |
+| rand | 6 | MIT OR Apache-2.0 | https://github.com/rust-random/rand |
 
 The excerpts are pinned to the checkouts they were copied from: ripgrep
 `3fce3b5` (ignore-0.4.33, 2026-08-04), serde `a874a1b` (2026-08-24), hashbrown
 `8710205` (2026-09-06), proptest `a6f033c` (2026-08-21), tokio `8146318`
-(2026-09-14), axum `0b9325b` (2026-09-14), leptos `6f09f08` (2026-09-13) and
-sqlx `1be995b` (2026-09-14).
+(2026-09-14), axum `0b9325b` (2026-09-14), leptos `6f09f08` (2026-09-13),
+sqlx `1be995b` (2026-09-14) and rand `9e7d328` (2026-09-20).
