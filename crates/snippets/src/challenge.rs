@@ -642,14 +642,14 @@ static CHALLENGES: &[Challenge] = &[
   },
   Challenge {
     id: "challenge-rd-06",
-    title: "Coin flipper",
+    title: "Weighted index",
     project: "rand",
-    source_path: "src/seq/coin_flipper.rs",
+    source_path: "src/distr/weighted/weighted_index.rs",
     license: "MIT OR Apache-2.0",
     level: 6,
     accuracy_goal: TWO_STAR_ACCURACY,
     wpm_goal: 46.0,
-    code: include_str!("../../../challenges/rand/06-coin-flipper.rs"),
+    code: include_str!("../../../challenges/rand/06-weighted-index.rs"),
   },
 ];
 
