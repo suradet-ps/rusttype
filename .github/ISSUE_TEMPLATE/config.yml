@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Development guide
+    url: https://github.com/suradet-ps/rusttype/blob/main/AGENTS.md
+    about: Architecture, conventions, milestones, and snippet authoring rules
